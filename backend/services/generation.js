@@ -83,7 +83,7 @@ Provide a helpful answer:`;
   } catch (error) {
     console.error("❌ Gemini API Error:", error.message);
     console.log("🔄 Using fallback response generator...");
-    
+
     // Use fallback when Gemini API fails (quota, network, etc.)
     const fallbackAnswer = generateFallbackResponse(
       query,
@@ -91,7 +91,7 @@ Provide a helpful answer:`;
       isUnsafe,
       safetyKeywords
     );
-    
+
     return fallbackAnswer;
   }
 };

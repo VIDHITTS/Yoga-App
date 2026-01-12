@@ -37,7 +37,7 @@ function processKnowledgeBase(articles) {
   articles.forEach((article, articleIdx) => {
     // Combine info and precautions for full content
     const fullContent = `${article.info}\n\nPrecautions: ${article.precautions}`;
-    
+
     // For shorter articles, use the entire content as one chunk
     if (fullContent.split(" ").length <= CHUNK_SIZE) {
       processedChunks.push({

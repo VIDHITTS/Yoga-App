@@ -20,14 +20,17 @@ const retrieveContext = async (queryEmbedding, topK = 5) => {
     // Format results
     const retrievedChunks = queryResponse.matches.map((match) => {
       // Combine info and precautions into content
-      const content = `${match.metadata.info || ''}\n\nPrecautions: ${match.metadata.precautions || ''}`;
-      
+      const content = `${match.metadata.info || ""}\n\nPrecautions: ${
+        match.metadata.precautions || ""
+      }`;
+
       return {
         chunkId: match.id,
         title: match.metadata.title,
         content: content.trim(),
         category: match.metadata.category,
-        source: match.metadata.source || "Common Yoga Protocol - Ministry of Ayush",
+        source:
+          match.metadata.source || "Common Yoga Protocol - Ministry of Ayush",
         score: match.score,
       };
     });

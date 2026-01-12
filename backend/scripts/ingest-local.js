@@ -7,9 +7,13 @@ const knowledgeBase = require("../data/yoga_knowledge.json");
  * Ingest knowledge base using FREE local embeddings - no API costs!
  */
 async function ingestWithLocalEmbeddings() {
-  console.log("======================================================================");
+  console.log(
+    "======================================================================"
+  );
   console.log("🧘 YOGA KNOWLEDGE BASE INGESTION - FREE LOCAL EMBEDDINGS");
-  console.log("======================================================================\n");
+  console.log(
+    "======================================================================\n"
+  );
 
   try {
     // Initialize Pinecone
@@ -28,15 +32,17 @@ async function ingestWithLocalEmbeddings() {
     // Process each article
     for (let i = 0; i < knowledgeBase.length; i++) {
       const article = knowledgeBase[i];
-      
+
       try {
         // Create content for embedding
         const content = `Title: ${article.title}\n\nInformation:\n${article.info}\n\nPrecautions:\n${article.precautions}`;
-        
+
         // Generate embedding locally (FREE!)
-        console.log(`[${i + 1}/${knowledgeBase.length}] Embedding: ${article.title}`);
+        console.log(
+          `[${i + 1}/${knowledgeBase.length}] Embedding: ${article.title}`
+        );
         const embedding = await generateLocalEmbedding(content);
-        
+
         // Prepare vector for Pinecone
         const vector = {
           id: article.id,
@@ -49,38 +55,45 @@ async function ingestWithLocalEmbeddings() {
             source: "Common Yoga Protocol - Ministry of Ayush",
           },
         };
-        
+
         // Upload to Pinecone
         await index.upsert([vector]);
-        
+
         successCount++;
-        
+
         // Progress indicator
         if ((i + 1) % 10 === 0) {
-          console.log(`   ✓ Progress: ${i + 1}/${knowledgeBase.length} articles uploaded`);
+          console.log(
+            `   ✓ Progress: ${i + 1}/${knowledgeBase.length} articles uploaded`
+          );
         }
-        
       } catch (error) {
-        console.error(`   ✗ Failed to process ${article.title}:`, error.message);
+        console.error(
+          `   ✗ Failed to process ${article.title}:`,
+          error.message
+        );
         failCount++;
       }
     }
 
-    console.log("\n======================================================================");
+    console.log(
+      "\n======================================================================"
+    );
     console.log("✅ INGESTION COMPLETE!");
-    console.log("======================================================================");
+    console.log(
+      "======================================================================"
+    );
     console.log(`✓ Successfully uploaded: ${successCount} articles`);
     if (failCount > 0) {
       console.log(`✗ Failed: ${failCount} articles`);
     }
     console.log("\n📊 Verifying index statistics...");
-    
+
     // Verify
     const stats = await index.describeIndexStats();
     console.log(`   Total vectors in Pinecone: ${stats.totalRecordCount}`);
     console.log(`   Dimension: ${stats.dimension}`);
     console.log("\n✨ Your RAG system is ready to use!\n");
-
   } catch (error) {
     console.error("\n❌ Ingestion failed:", error.message);
     console.error(error);

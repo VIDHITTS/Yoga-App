@@ -9,9 +9,13 @@ const knowledgeBase = require("../data/yoga_knowledge.json");
  * Small test ingestion - just 5 articles to test the system
  */
 async function ingestSmallTest() {
-  console.log("======================================================================");
+  console.log(
+    "======================================================================"
+  );
   console.log("🧪 SMALL TEST INGESTION - 5 ARTICLES");
-  console.log("======================================================================\n");
+  console.log(
+    "======================================================================\n"
+  );
 
   try {
     // Initialize Pinecone
@@ -37,7 +41,7 @@ async function ingestSmallTest() {
     // Convert to LangChain Document objects
     const documents = testArticles.map((article) => {
       const content = `Title: ${article.title}\n\nInformation:\n${article.info}\n\nPrecautions:\n${article.precautions}`;
-      
+
       return new Document({
         pageContent: content,
         metadata: {
@@ -68,7 +72,6 @@ async function ingestSmallTest() {
     console.log(`   Total vectors: ${stats.totalRecordCount}`);
     console.log(`   Dimension: ${stats.dimension}`);
     console.log("\n✨ Test successful! System is working correctly.\n");
-
   } catch (error) {
     console.error("\n❌ Test ingestion failed:", error.message);
     throw error;
