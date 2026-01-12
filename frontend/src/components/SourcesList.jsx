@@ -1,5 +1,5 @@
-import React from 'react';
-import './SourcesList.css';
+import React from "react";
+import "./SourcesList.css";
 
 const SourcesList = ({ sources }) => {
   return (
@@ -22,13 +22,9 @@ const SourcesList = ({ sources }) => {
             <h4 className="source-title">{source.title}</h4>
 
             <div className="source-meta">
-              <span className="meta-item">
-                📖 {source.source}
-              </span>
+              <span className="meta-item">📖 {source.source}</span>
               {source.page && (
-                <span className="meta-item">
-                  📄 Page {source.page}
-                </span>
+                <span className="meta-item">📄 Page {source.page}</span>
               )}
             </div>
           </div>
@@ -37,8 +33,9 @@ const SourcesList = ({ sources }) => {
 
       <div className="citation-note">
         <p>
-          All information is sourced from the <strong>Common Yoga Protocol</strong>,
-          published by the Ministry of Ayush, Government of India.
+          All information is sourced from the{" "}
+          <strong>Common Yoga Protocol</strong>, published by the Ministry of
+          Ayush, Government of India.
         </p>
       </div>
     </div>

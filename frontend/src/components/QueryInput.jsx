@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import './QueryInput.css';
+import React, { useState } from "react";
+import "./QueryInput.css";
 
 const QueryInput = ({ onSubmit, isLoading }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,7 +15,7 @@ const QueryInput = ({ onSubmit, isLoading }) => {
     "What are the benefits of Surya Namaskar?",
     "How do I start meditation practice?",
     "What yoga poses are good for back pain?",
-    "Tell me about pranayama breathing techniques"
+    "Tell me about pranayama breathing techniques",
   ];
 
   const handleExampleClick = (example) => {
@@ -27,7 +27,8 @@ const QueryInput = ({ onSubmit, isLoading }) => {
       <div className="input-header">
         <h1 className="title">🧘 Ask Me Anything About Yoga</h1>
         <p className="subtitle">
-          Get accurate, safe yoga guidance powered by AI and authoritative sources
+          Get accurate, safe yoga guidance powered by AI and authoritative
+          sources
         </p>
       </div>
 
@@ -42,14 +43,12 @@ const QueryInput = ({ onSubmit, isLoading }) => {
             maxLength="500"
             disabled={isLoading}
           />
-          <div className="char-count">
-            {query.length}/500
-          </div>
+          <div className="char-count">{query.length}/500</div>
         </div>
-        
-        <button 
-          type="submit" 
-          className={`submit-button ${isLoading ? 'loading' : ''}`}
+
+        <button
+          type="submit"
+          className={`submit-button ${isLoading ? "loading" : ""}`}
           disabled={!query.trim() || isLoading}
         >
           {isLoading ? (

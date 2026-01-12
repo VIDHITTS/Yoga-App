@@ -1,0 +1,42 @@
+[
+  {
+    "id": "yoga_001",
+    "title": "Introduction to Yoga",
+    "source": "Common Yoga Protocol - Ministry of Ayush, Government of India",
+    "page": "5-8",
+    "info": "Yoga is an invaluable gift from India's ancient tradition. It embodies unity of mind and body, thought and action, restraint and fulfillment, harmony between man and nature, and a holistic approach to health and well-being. The practice of Yoga leads to the union of individual consciousness with that of the Universal Consciousness.",
+    "precautions": "Practice under guidance if you are a beginner. Stop if you experience pain or discomfort."
+  },
+  {
+    "id": "yoga_007",
+    "title": "Hand to Foot Pose (Padahastasana)",
+    "source": "Common Yoga Protocol - Ministry of Ayush, Government of India",
+    "page": "19-20",
+    "info": "From standing, exhale and bend forward from the hips, bringing the hands down toward the feet. Keep the legs straight or slightly bent at knees if needed. Benefits: Stretches hamstrings and calf muscles, stimulates liver and kidneys, improves blood circulation to the brain, relieves mental and physical exhaustion.",
+    "precautions": "Avoid if you have severe back problems, sciatica, or high blood pressure. Pregnant women should not practice deep forward bends. Those with heart conditions should avoid holding this pose for long periods."
+  },
+  {
+    "id": "yoga_011",
+    "title": "Cobra Pose (Bhujangasana)",
+    "source": "Common Yoga Protocol - Ministry of Ayush, Government of India",
+    "page": "27-28",
+    "info": "Lie on the stomach with legs extended back, tops of feet on the floor. Place hands under shoulders, elbows close to body. Press through hands and slowly lift chest off the floor. Benefits: Strengthens spine and back muscles, opens chest and improves breathing, stimulates abdominal organs, relieves stress and fatigue.",
+    "precautions": "Avoid if pregnant, have serious back injury, carpal tunnel syndrome, or recent abdominal surgery. Those with herniated discs should practice with caution or avoid."
+  },
+  {
+    "id": "yoga_019",
+    "title": "Kapalabhati Pranayama (Skull Shining Breath)",
+    "source": "Common Yoga Protocol - Ministry of Ayush, Government of India",
+    "page": "45-46",
+    "info": "Sit comfortably with spine erect. Take a deep breath in. Exhale forcefully through nose by contracting abdominal muscles. Allow inhalation to happen passively. Start with 20 breaths per round. Benefits: Cleanses respiratory system, strengthens abdominal muscles, energizes body and mind, improves digestion, enhances concentration.",
+    "precautions": "Avoid if pregnant, have high blood pressure, heart disease, hernia, ulcer, or during menstruation."
+  },
+  {
+    "id": "yoga_096",
+    "title": "Yoga During Pregnancy - Safe Practices",
+    "source": "Common Yoga Protocol - Ministry of Ayush, Government of India",
+    "page": "Special Conditions",
+    "info": "Pregnancy requires special considerations for yoga practice. Safe practices: Gentle breathing exercises, Pelvic floor exercises, Cat-Cow stretches, Modified standing poses with wall support. Benefits: Prepares body for childbirth, strengthens pelvic floor, reduces back pain, improves circulation, reduces stress and anxiety.",
+    "precautions": "Always practice under guidance of qualified prenatal yoga instructor. Avoid all inversions, deep twists, strong backbends, poses lying on belly after first trimester, breath retention, Kapalabhati and Bhastrika, jumping or jerky movements. Consult doctor before beginning practice."
+  }
+]

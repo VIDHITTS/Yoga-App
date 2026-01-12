@@ -9,7 +9,13 @@
     "ingest": "node scripts/ingest.js",
     "test": "node scripts/test-query.js"
   },
-  "keywords": ["yoga", "rag", "wellness", "ai", "pinecone"],
+  "keywords": [
+    "yoga",
+    "rag",
+    "wellness",
+    "ai",
+    "pinecone"
+  ],
   "author": "Vidhitt S",
   "license": "ISC",
   "dependencies": {

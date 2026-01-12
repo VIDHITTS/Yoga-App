@@ -1,5 +1,5 @@
-import React from 'react';
-import './SafetyWarning.css';
+import React from "react";
+import "./SafetyWarning.css";
 
 const SafetyWarning = ({ safety }) => {
   return (
@@ -11,7 +11,7 @@ const SafetyWarning = ({ safety }) => {
 
       {safety.message && (
         <div className="warning-message">
-          {safety.message.split('\n').map((line, index) => (
+          {safety.message.split("\n").map((line, index) => (
             <p key={index}>{line}</p>
           ))}
         </div>
@@ -43,7 +43,7 @@ const SafetyWarning = ({ safety }) => {
 
       <div className="warning-footer">
         <p className="footer-text">
-          ⓘ This information is educational. Always consult qualified healthcare 
+          ⓘ This information is educational. Always consult qualified healthcare
           professionals and certified yoga therapists for personalized guidance.
         </p>
       </div>

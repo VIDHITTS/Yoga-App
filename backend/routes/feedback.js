@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const QueryLog = require('../models/QueryLog');
+const QueryLog = require("../models/QueryLog");
 
 /**
  * POST /api/feedback
  * Submit feedback for a query response
  */
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { queryId, helpful } = req.body;
 
@@ -14,14 +14,14 @@ router.post('/', async (req, res) => {
     if (!queryId) {
       return res.status(400).json({
         success: false,
-        error: 'queryId is required'
+        error: "queryId is required",
       });
     }
 
-    if (typeof helpful !== 'boolean') {
+    if (typeof helpful !== "boolean") {
       return res.status(400).json({
         success: false,
-        error: 'helpful must be a boolean value (true/false)'
+        error: "helpful must be a boolean value (true/false)",
       });
     }
 
@@ -31,35 +31,36 @@ router.post('/', async (req, res) => {
     if (!queryLog) {
       return res.status(404).json({
         success: false,
-        error: 'Query not found'
+        error: "Query not found",
       });
     }
 
     // Update feedback
     queryLog.feedback = {
       helpful,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     await queryLog.save();
 
-    console.log(`📝 Feedback received for query ${queryId}: ${helpful ? '👍' : '👎'}`);
+    console.log(
+      `📝 Feedback received for query ${queryId}: ${helpful ? "👍" : "👎"}`
+    );
 
     res.json({
       success: true,
-      message: 'Thank you for your feedback!',
+      message: "Thank you for your feedback!",
       feedback: {
         queryId,
         helpful,
-        timestamp: queryLog.feedback.timestamp
-      }
+        timestamp: queryLog.feedback.timestamp,
+      },
     });
-
   } catch (error) {
-    console.error('❌ Error in /api/feedback:', error);
+    console.error("❌ Error in /api/feedback:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to submit feedback'
+      error: "Failed to submit feedback",
     });
   }
 });
@@ -68,18 +69,18 @@ router.post('/', async (req, res) => {
  * GET /api/feedback/stats
  * Get feedback statistics
  */
-router.get('/stats', async (req, res) => {
+router.get("/stats", async (req, res) => {
   try {
     const totalWithFeedback = await QueryLog.countDocuments({
-      'feedback.helpful': { $ne: null }
+      "feedback.helpful": { $ne: null },
     });
-    
+
     const helpfulCount = await QueryLog.countDocuments({
-      'feedback.helpful': true
+      "feedback.helpful": true,
     });
-    
+
     const unhelpfulCount = await QueryLog.countDocuments({
-      'feedback.helpful': false
+      "feedback.helpful": false,
     });
 
     res.json({
@@ -88,17 +89,17 @@ router.get('/stats', async (req, res) => {
         totalWithFeedback,
         helpful: helpfulCount,
         unhelpful: unhelpfulCount,
-        helpfulPercentage: totalWithFeedback > 0 
-          ? ((helpfulCount / totalWithFeedback) * 100).toFixed(2) 
-          : 0
-      }
+        helpfulPercentage:
+          totalWithFeedback > 0
+            ? ((helpfulCount / totalWithFeedback) * 100).toFixed(2)
+            : 0,
+      },
     });
-
   } catch (error) {
-    console.error('Error fetching feedback stats:', error);
+    console.error("Error fetching feedback stats:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch feedback statistics'
+      error: "Failed to fetch feedback statistics",
     });
   }
 });

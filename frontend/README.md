@@ -62,6 +62,7 @@ frontend/
 ## 🎨 Design System
 
 ### Colors
+
 - **Primary**: Purple gradient (#667eea to #764ba2)
 - **Success**: Green (#10b981)
 - **Warning**: Yellow/Amber (#f59e0b)
@@ -69,10 +70,12 @@ frontend/
 - **Text**: Gray scale (#1f2937 to #9ca3af)
 
 ### Typography
+
 - **Font Family**: Inter (Google Fonts)
 - **Weights**: 300, 400, 500, 600, 700
 
 ### Components
+
 - **Cards**: White background, rounded corners, subtle shadows
 - **Buttons**: Gradient or solid with hover effects
 - **Inputs**: Clean borders with focus states
@@ -99,24 +102,28 @@ REACT_APP_API_URL=http://localhost:5000
 ## ✨ Key Features Explained
 
 ### Query Input
+
 - Character counter (500 max)
 - Example questions for quick start
 - Disabled state during loading
 - Auto-focus on mount
 
 ### Response Display
+
 - Formatted answer with metadata
 - Response time and model display
 - Feedback buttons (thumbs up/down)
 - New query button
 
 ### Safety Warning
+
 - Prominent yellow warning banner
 - Detected conditions tags
 - Safer alternatives list
 - Professional disclaimer
 
 ### Sources List
+
 - Numbered source cards
 - Relevance scores
 - Source metadata (title, page, publication)

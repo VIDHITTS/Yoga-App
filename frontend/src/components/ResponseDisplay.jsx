@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { submitFeedback } from '../services/api';
-import SafetyWarning from './SafetyWarning';
-import SourcesList from './SourcesList';
-import './ResponseDisplay.css';
+import React, { useState } from "react";
+import { submitFeedback } from "../services/api";
+import SafetyWarning from "./SafetyWarning";
+import SourcesList from "./SourcesList";
+import "./ResponseDisplay.css";
 
 const ResponseDisplay = ({ response, onNewQuery }) => {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
@@ -14,16 +14,14 @@ const ResponseDisplay = ({ response, onNewQuery }) => {
       setFeedbackSubmitted(true);
       setFeedbackType(helpful);
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      console.error("Failed to submit feedback:", error);
     }
   };
 
   return (
     <div className="response-container">
       {/* Safety Warning */}
-      {response.safety.isUnsafe && (
-        <SafetyWarning safety={response.safety} />
-      )}
+      {response.safety.isUnsafe && <SafetyWarning safety={response.safety} />}
 
       {/* Answer Section */}
       <div className="answer-card">
@@ -33,9 +31,7 @@ const ResponseDisplay = ({ response, onNewQuery }) => {
             <span className="metadata-item">
               ⏱️ {response.metadata.responseTime}ms
             </span>
-            <span className="metadata-item">
-              🤖 {response.metadata.model}
-            </span>
+            <span className="metadata-item">🤖 {response.metadata.model}</span>
           </div>
         </div>
 
@@ -65,7 +61,7 @@ const ResponseDisplay = ({ response, onNewQuery }) => {
             </>
           ) : (
             <p className="feedback-thanks">
-              {feedbackType ? '✅' : '📝'} Thank you for your feedback!
+              {feedbackType ? "✅" : "📝"} Thank you for your feedback!
             </p>
           )}
         </div>

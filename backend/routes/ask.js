@@ -1,33 +1,37 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const QueryLog = require('../models/QueryLog');
-const { generateEmbedding } = require('../services/embeddings');
-const { retrieveContext } = require('../services/retrieval');
-const { generateResponse } = require('../services/generation');
-const { detectUnsafeQuery, generateSafetyMessage, getSafeAlternatives } = require('../services/safety');
+const QueryLog = require("../models/QueryLog");
+const { generateEmbedding } = require("../services/embeddings");
+const { retrieveContext } = require("../services/retrieval");
+const { generateResponse } = require("../services/generation");
+const {
+  detectUnsafeQuery,
+  generateSafetyMessage,
+  getSafeAlternatives,
+} = require("../services/safety");
 
 /**
  * POST /api/ask
  * Main endpoint for processing yoga-related queries
  */
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   const startTime = Date.now();
-  
+
   try {
     const { query } = req.body;
 
     // Validation
-    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+    if (!query || typeof query !== "string" || query.trim().length === 0) {
       return res.status(400).json({
         success: false,
-        error: 'Query is required and must be a non-empty string'
+        error: "Query is required and must be a non-empty string",
       });
     }
 
     if (query.length > 500) {
       return res.status(400).json({
         success: false,
-        error: 'Query is too long. Please keep it under 500 characters.'
+        error: "Query is too long. Please keep it under 500 characters.",
       });
     }
 
@@ -35,41 +39,45 @@ router.post('/', async (req, res) => {
 
     // Step 1: Safety Detection
     const safetyCheck = detectUnsafeQuery(query);
-    console.log(`🛡️  Safety Check: ${safetyCheck.isUnsafe ? '⚠️ UNSAFE' : '✅ SAFE'}`);
-    
+    console.log(
+      `🛡️  Safety Check: ${safetyCheck.isUnsafe ? "⚠️ UNSAFE" : "✅ SAFE"}`
+    );
+
     if (safetyCheck.isUnsafe) {
-      console.log(`   Detected Keywords: ${safetyCheck.keywords.join(', ')}`);
-      console.log(`   Categories: ${safetyCheck.categories.join(', ')}`);
+      console.log(`   Detected Keywords: ${safetyCheck.keywords.join(", ")}`);
+      console.log(`   Categories: ${safetyCheck.categories.join(", ")}`);
     }
 
     // Step 2: Generate Embedding
-    console.log('🔢 Generating embedding...');
+    console.log("🔢 Generating embedding...");
     const embedding = await generateEmbedding(query);
     console.log(`   ✅ Embedding generated (${embedding.length} dimensions)`);
 
     // Step 3: Retrieve Relevant Context
-    console.log('📚 Retrieving relevant context from Pinecone...');
+    console.log("📚 Retrieving relevant context from Pinecone...");
     const retrievedChunks = await retrieveContext(embedding);
     console.log(`   ✅ Retrieved ${retrievedChunks.length} relevant chunks`);
-    
+
     retrievedChunks.forEach((chunk, idx) => {
-      console.log(`   ${idx + 1}. ${chunk.title} (score: ${chunk.score.toFixed(4)})`);
+      console.log(
+        `   ${idx + 1}. ${chunk.title} (score: ${chunk.score.toFixed(4)})`
+      );
     });
 
     // Step 4: Generate Response
-    console.log('🤖 Generating AI response...');
+    console.log("🤖 Generating AI response...");
     const answer = await generateResponse(
       query,
       retrievedChunks,
       safetyCheck.isUnsafe,
       safetyCheck.keywords
     );
-    console.log('   ✅ Response generated');
+    console.log("   ✅ Response generated");
 
     // Step 5: Prepare Safety Information
     let safetyMessage = null;
     let safeAlternatives = [];
-    
+
     if (safetyCheck.isUnsafe) {
       safetyMessage = generateSafetyMessage(safetyCheck.categories);
       safeAlternatives = getSafeAlternatives(safetyCheck.categories);
@@ -82,13 +90,13 @@ router.post('/', async (req, res) => {
     const queryLog = new QueryLog({
       query: query.trim(),
       embedding: embedding.slice(0, 100), // Store only first 100 dims to save space
-      retrievedChunks: retrievedChunks.map(chunk => ({
+      retrievedChunks: retrievedChunks.map((chunk) => ({
         chunkId: chunk.chunkId,
         title: chunk.title,
         content: chunk.content.substring(0, 200), // Store truncated content
         source: chunk.source,
         page: chunk.page,
-        score: chunk.score
+        score: chunk.score,
       })),
       answer,
       isUnsafe: safetyCheck.isUnsafe,
@@ -96,7 +104,7 @@ router.post('/', async (req, res) => {
       safetyMessage,
       responseTime,
       ipAddress: req.ip || req.connection.remoteAddress,
-      userAgent: req.get('user-agent'),
+      userAgent: req.get("user-agent"),
     });
 
     await queryLog.save();
@@ -112,28 +120,27 @@ router.post('/', async (req, res) => {
         title: chunk.title,
         source: chunk.source,
         page: chunk.page,
-        relevanceScore: chunk.score
+        relevanceScore: chunk.score,
       })),
       safety: {
         isUnsafe: safetyCheck.isUnsafe,
         message: safetyMessage,
         alternatives: safeAlternatives,
-        detectedConditions: safetyCheck.categories
+        detectedConditions: safetyCheck.categories,
       },
       metadata: {
         responseTime,
         chunksRetrieved: retrievedChunks.length,
-        model: 'gemini-pro'
-      }
+        model: "gemini-pro",
+      },
     });
-
   } catch (error) {
-    console.error('❌ Error in /api/ask:', error);
-    
+    console.error("❌ Error in /api/ask:", error);
+
     // Log error to database
     try {
       const errorLog = new QueryLog({
-        query: req.body.query || 'Error: Query not captured',
+        query: req.body.query || "Error: Query not captured",
         answer: `Error: ${error.message}`,
         isUnsafe: false,
         responseTime: Date.now() - startTime,
@@ -141,13 +148,14 @@ router.post('/', async (req, res) => {
       });
       await errorLog.save();
     } catch (logError) {
-      console.error('Failed to log error:', logError);
+      console.error("Failed to log error:", logError);
     }
 
     res.status(500).json({
       success: false,
-      error: 'An error occurred while processing your query. Please try again.',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: "An error occurred while processing your query. Please try again.",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 });
@@ -156,12 +164,12 @@ router.post('/', async (req, res) => {
  * GET /api/ask/stats
  * Get query statistics
  */
-router.get('/stats', async (req, res) => {
+router.get("/stats", async (req, res) => {
   try {
     const totalQueries = await QueryLog.countDocuments();
     const unsafeQueries = await QueryLog.countDocuments({ isUnsafe: true });
     const avgResponseTime = await QueryLog.aggregate([
-      { $group: { _id: null, avgTime: { $avg: '$responseTime' } } }
+      { $group: { _id: null, avgTime: { $avg: "$responseTime" } } },
     ]);
 
     res.json({
@@ -170,13 +178,18 @@ router.get('/stats', async (req, res) => {
         totalQueries,
         unsafeQueries,
         safeQueries: totalQueries - unsafeQueries,
-        unsafePercentage: totalQueries > 0 ? ((unsafeQueries / totalQueries) * 100).toFixed(2) : 0,
-        avgResponseTime: avgResponseTime[0]?.avgTime?.toFixed(0) || 0
-      }
+        unsafePercentage:
+          totalQueries > 0
+            ? ((unsafeQueries / totalQueries) * 100).toFixed(2)
+            : 0,
+        avgResponseTime: avgResponseTime[0]?.avgTime?.toFixed(0) || 0,
+      },
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch statistics' });
+    console.error("Error fetching stats:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch statistics" });
   }
 });
 

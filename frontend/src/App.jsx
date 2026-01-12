@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import QueryInput from './components/QueryInput';
-import ResponseDisplay from './components/ResponseDisplay';
-import { askQuestion } from './services/api';
-import './App.css';
+import React, { useState } from "react";
+import QueryInput from "./components/QueryInput";
+import ResponseDisplay from "./components/ResponseDisplay";
+import { askQuestion } from "./services/api";
+import "./App.css";
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -38,9 +38,7 @@ function App() {
             <span className="logo-icon">🧘‍♀️</span>
             <span className="logo-text">Yoga Wellness Assistant</span>
           </div>
-          <div className="header-badge">
-            Powered by AI & Ayush Protocol
-          </div>
+          <div className="header-badge">Powered by AI & Ayush Protocol</div>
         </header>
 
         {/* Main Content */}
@@ -52,7 +50,9 @@ function App() {
           {loading && (
             <div className="loading-container">
               <div className="loading-spinner"></div>
-              <p className="loading-text">Searching knowledge base and generating answer...</p>
+              <p className="loading-text">
+                Searching knowledge base and generating answer...
+              </p>
               <p className="loading-subtext">This usually takes 2-3 seconds</p>
             </div>
           )}
@@ -76,10 +76,12 @@ function App() {
         {/* Footer */}
         <footer className="app-footer">
           <p className="footer-text">
-            Built with ❤️ using RAG technology • Knowledge from Ministry of Ayush, Govt. of India
+            Built with ❤️ using RAG technology • Knowledge from Ministry of
+            Ayush, Govt. of India
           </p>
           <p className="footer-disclaimer">
-            This application provides educational information only. Always consult healthcare professionals for medical advice.
+            This application provides educational information only. Always
+            consult healthcare professionals for medical advice.
           </p>
         </footer>
       </div>

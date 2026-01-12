@@ -1,24 +1,33 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 /**
  * Generate answer using Gemini with retrieved context
  */
-const generateResponse = async (query, retrievedChunks, isUnsafe, safetyKeywords) => {
+const generateResponse = async (
+  query,
+  retrievedChunks,
+  isUnsafe,
+  safetyKeywords
+) => {
   try {
     // Construct context from retrieved chunks
     const contextText = retrievedChunks
-      .map((chunk, idx) => `[Source ${idx + 1}: ${chunk.title}]\n${chunk.content}`)
-      .join('\n\n---\n\n');
+      .map(
+        (chunk, idx) => `[Source ${idx + 1}: ${chunk.title}]\n${chunk.content}`
+      )
+      .join("\n\n---\n\n");
 
     // Build prompt based on safety status
-    let prompt = '';
-    
+    let prompt = "";
+
     if (isUnsafe) {
       prompt = `You are a knowledgeable and helpful yoga wellness assistant. 
 
-IMPORTANT: This query mentions health conditions (${safetyKeywords.join(', ')}). You must provide safe, general information without medical advice.
+IMPORTANT: This query mentions health conditions (${safetyKeywords.join(
+        ", "
+      )}). You must provide safe, general information without medical advice.
 
 Context from Knowledge Base:
 ${contextText}
@@ -52,10 +61,12 @@ Provide a helpful answer:`;
     }
 
     // Generate response with Gemini
-    const model = genAI.getGenerativeModel({ model: process.env.GENERATION_MODEL || 'gemini-pro' });
-    
+    const model = genAI.getGenerativeModel({
+      model: process.env.GENERATION_MODEL || "gemini-pro",
+    });
+
     const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.3,
         topK: 40,
@@ -69,8 +80,8 @@ Provide a helpful answer:`;
 
     return answer;
   } catch (error) {
-    console.error('❌ Generation Error:', error.message);
-    throw new Error('Failed to generate response');
+    console.error("❌ Generation Error:", error.message);
+    throw new Error("Failed to generate response");
   }
 };
 

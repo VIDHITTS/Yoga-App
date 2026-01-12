@@ -1,4 +1,4 @@
-const { Pinecone } = require('@pinecone-database/pinecone');
+const { Pinecone } = require("@pinecone-database/pinecone");
 
 let pineconeClient = null;
 
@@ -12,10 +12,10 @@ const initPinecone = async () => {
       apiKey: process.env.PINECONE_API_KEY,
     });
 
-    console.log('✅ Pinecone Client Initialized');
+    console.log("✅ Pinecone Client Initialized");
     return pineconeClient;
   } catch (error) {
-    console.error('❌ Pinecone Initialization Error:', error.message);
+    console.error("❌ Pinecone Initialization Error:", error.message);
     throw error;
   }
 };

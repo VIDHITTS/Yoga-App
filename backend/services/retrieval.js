@@ -1,4 +1,4 @@
-const { getIndex } = require('../config/pinecone');
+const { getIndex } = require("../config/pinecone");
 
 /**
  * Retrieve relevant chunks from Pinecone based on query embedding
@@ -9,7 +9,7 @@ const { getIndex } = require('../config/pinecone');
 const retrieveContext = async (queryEmbedding, topK = 5) => {
   try {
     const index = await getIndex();
-    
+
     // Query Pinecone for similar vectors
     const queryResponse = await index.query({
       vector: queryEmbedding,
@@ -18,7 +18,7 @@ const retrieveContext = async (queryEmbedding, topK = 5) => {
     });
 
     // Format results
-    const retrievedChunks = queryResponse.matches.map(match => ({
+    const retrievedChunks = queryResponse.matches.map((match) => ({
       chunkId: match.id,
       title: match.metadata.title,
       content: match.metadata.content,
@@ -29,8 +29,8 @@ const retrieveContext = async (queryEmbedding, topK = 5) => {
 
     return retrievedChunks;
   } catch (error) {
-    console.error('❌ Retrieval Error:', error.message);
-    throw new Error('Failed to retrieve relevant information');
+    console.error("❌ Retrieval Error:", error.message);
+    throw new Error("Failed to retrieve relevant information");
   }
 };
 

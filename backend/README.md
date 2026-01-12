@@ -47,6 +47,7 @@ npm run ingest
 ```
 
 This will:
+
 - Process 50 yoga articles from `data/yoga_knowledge.json`
 - Split into semantic chunks with overlap
 - Generate embeddings using Gemini
@@ -73,6 +74,7 @@ npm test
 Submit a yoga-related query.
 
 **Request:**
+
 ```json
 {
   "query": "What are the benefits of meditation?"
@@ -80,6 +82,7 @@ Submit a yoga-related query.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -113,6 +116,7 @@ Submit a yoga-related query.
 Submit feedback for a response.
 
 **Request:**
+
 ```json
 {
   "queryId": "507f1f77bcf86cd799439011",
@@ -125,6 +129,7 @@ Submit feedback for a response.
 Get query statistics.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -152,6 +157,7 @@ The system detects potentially unsafe queries mentioning:
 - Recent trauma
 
 When detected, the system:
+
 1. ✅ Still retrieves relevant information
 2. 🔴 Returns safety warning
 3. 💡 Provides safer alternatives
@@ -210,22 +216,26 @@ backend/
 ## 🔬 RAG Pipeline Details
 
 ### 1. Chunking Strategy
+
 - **Size**: 350 words
 - **Overlap**: 50 words
 - **Rationale**: Balances context and precision
 
 ### 2. Embeddings
+
 - **Model**: Gemini text-embedding-004
 - **Dimensions**: 768
 - **Why**: High-quality semantic understanding
 
 ### 3. Retrieval
+
 - **Store**: Pinecone
 - **Metric**: Cosine similarity
 - **Top-K**: 5 chunks
 - **Why**: Managed, fast, production-ready
 
 ### 4. Generation
+
 - **Model**: Gemini Pro
 - **Temperature**: 0.3 (consistent responses)
 - **Context**: Retrieved chunks + safety instructions
@@ -233,14 +243,17 @@ backend/
 ## 🐛 Troubleshooting
 
 **MongoDB connection issues:**
+
 - Check connection string format
 - Verify network access in MongoDB Atlas
 
 **Pinecone errors:**
+
 - Ensure index is created (run `npm run ingest`)
 - Verify API key is correct
 
 **Gemini API errors:**
+
 - Check API key validity
 - Verify quota/billing
 
