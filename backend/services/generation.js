@@ -1,4 +1,5 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { generateFallbackResponse } = require("./fallback-generation");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -80,8 +81,18 @@ Provide a helpful answer:`;
 
     return answer;
   } catch (error) {
-    console.error("❌ Generation Error:", error.message);
-    throw new Error("Failed to generate response");
+    console.error("❌ Gemini API Error:", error.message);
+    console.log("🔄 Using fallback response generator...");
+    
+    // Use fallback when Gemini API fails (quota, network, etc.)
+    const fallbackAnswer = generateFallbackResponse(
+      query,
+      retrievedChunks,
+      isUnsafe,
+      safetyKeywords
+    );
+    
+    return fallbackAnswer;
   }
 };
 

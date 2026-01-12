@@ -1,17 +1,14 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const { generateLocalEmbedding } = require("./local-embeddings");
 
 /**
- * Generate embeddings for text using Gemini
+ * Generate embeddings for text using FREE local embeddings
  * @param {string} text - Text to embed
- * @returns {Promise<number[]>} - Embedding vector
+ * @returns {Promise<number[]>} - Embedding vector (384 dimensions)
  */
 const generateEmbedding = async (text) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "embedding-001" });
-    const result = await model.embedContent(text);
-    return result.embedding.values;
+    const vector = await generateLocalEmbedding(text);
+    return vector;
   } catch (error) {
     console.error("❌ Embedding Error:", error.message);
     throw error;
