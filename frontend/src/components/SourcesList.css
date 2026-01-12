@@ -1,0 +1,125 @@
+.sources-container {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.sources-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.sources-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.sources-list {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.source-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.source-card:hover {
+  background: #f3f4f6;
+  border-color: #6366f1;
+  transform: translateX(4px);
+}
+
+.source-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.source-number {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.relevance-score {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #10b981;
+  background: #ecfdf5;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+}
+
+.source-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.source-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.meta-item {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.citation-note {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 3px solid #8b5cf6;
+}
+
+.citation-note p {
+  font-size: 0.875rem;
+  color: #5b21b6;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.citation-note strong {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .sources-container {
+    padding: 1.5rem;
+  }
+
+  .source-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .source-title {
+    font-size: 1rem;
+  }
+
+  .source-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
