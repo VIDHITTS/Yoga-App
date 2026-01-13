@@ -36,6 +36,51 @@ router.post("/", async (req, res) => {
     }
 
     console.log(`\n🔍 Processing Query: "${query}"`);
+    
+    // STRICT BOUNDARY CHECK: Only answer yoga-related questions
+    const yogaKeywords = ['yoga', 'asana', 'pose', 'poses', 'pranayama', 'meditation', 'breathing', 'breath', 'namaste', 'chakra', 'mindfulness', 'stretch', 'flexibility', 'wellness', 'practice', 'spiritual', 'exercise', 'exercises', 'surya', 'namaskar', 'shavasana', 'tadasana', 'relaxation', 'health', 'benefits', 'technique', 'techniques'];
+    const isYogaRelated = yogaKeywords.some(keyword => query.toLowerCase().includes(keyword));
+    
+    if (!isYogaRelated && query.trim().length < 100) {
+      console.log("⛔ Non-yoga query detected - rejecting");
+      
+      const rejectionMessage = "I'm a yoga wellness assistant and can only answer questions about yoga practice, poses, breathing techniques, and meditation. Please ask me something related to yoga!";
+      
+      // Still log to MongoDB for tracking
+      const queryLog = new QueryLog({
+        query: query.trim(),
+        embedding: [],
+        retrievedChunks: [],
+        answer: rejectionMessage,
+        isUnsafe: false,
+        safetyKeywords: [],
+        safetyMessage: null,
+        responseTime: Date.now() - startTime,
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent"),
+      });
+
+      await queryLog.save();
+      console.log(`📝 Query logged to MongoDB (ID: ${queryLog._id})`);
+      
+      return res.json({
+        success: true,
+        queryId: queryLog._id,
+        answer: rejectionMessage,
+        sources: [],
+        safety: {
+          isUnsafe: false,
+          message: null,
+          alternatives: [],
+          detectedConditions: [],
+        },
+        metadata: {
+          responseTime: Date.now() - startTime,
+          chunksRetrieved: 0,
+          model: "boundary-check",
+        },
+      });
+    }
 
     // Step 1: Safety Detection
     const safetyCheck = detectUnsafeQuery(query);

@@ -15,6 +15,14 @@ const generateResponse = async (
   safetyKeywords
 ) => {
   try {
+    // STRICT PRE-CHECK: Only answer yoga-related questions
+    const yogaKeywords = ['yoga', 'asana', 'pose', 'pranayama', 'meditation', 'breathing', 'namaste', 'chakra', 'mindfulness', 'stretch', 'flexibility', 'wellness', 'practice', 'spiritual', 'exercise', 'surya', 'namaskar', 'shavasana', 'tadasana', 'pregnant', 'pregnancy'];
+    const isYogaRelated = yogaKeywords.some(keyword => query.toLowerCase().includes(keyword));
+
+    if (!isYogaRelated && query.trim().length < 50) {
+      return "Hey there! I'm your yoga wellness guide. I can help with poses, breathing techniques, meditation, and more. What would you like to explore today?";
+    }
+
     // Construct context from retrieved chunks
     const contextText = retrievedChunks
       .map(
