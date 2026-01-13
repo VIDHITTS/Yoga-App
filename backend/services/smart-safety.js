@@ -1,0 +1,84 @@
+const Groq = require("groq-sdk");
+
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY,
+});
+
+/**
+ * Smart Safety Check using LLM
+ * Returns structured safety analysis with safe alternatives
+ */
+const checkSafetyWithLLM = async (query) => {
+    try {
+        const safetyPrompt = `Analyze this yoga-related query for safety risks.
+
+Query: "${query}"
+
+Check for these SAFETY RISKS:
+- Pregnancy / Post-natal / Trimester mentions
+- Surgery, Hernia, Fracture, Injury, Post-operative
+- Heart conditions, High Blood Pressure, Cardiovascular issues
+- Glaucoma, Eye problems
+- Chronic conditions (diabetes, epilepsy, vertigo)
+- Recent trauma or acute pain
+
+RESPOND IN VALID JSON ONLY (no markdown, no explanation):
+
+If RISK DETECTED:
+{
+  "isUnsafe": true,
+  "detectedCondition": "brief condition name",
+  "reason": "A gentle 1-sentence explanation of the risk",
+  "modification": "A specific safer alternative practice (breathing, gentle poses, meditation)"
+}
+
+If SAFE:
+{
+  "isUnsafe": false,
+  "detectedCondition": null,
+  "reason": null,
+  "modification": null
+}`;
+
+        const completion = await groq.chat.completions.create({
+            messages: [{ role: "user", content: safetyPrompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.1,
+            max_tokens: 256,
+        });
+
+        const responseText = completion.choices[0]?.message?.content || "{}";
+
+        // Parse JSON response
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+
+        return { isUnsafe: false };
+    } catch (error) {
+        console.error("❌ LLM Safety Check Error:", error.message);
+        // Fallback to keyword-based check
+        return null;
+    }
+};
+
+/**
+ * Generate a safety pivot response (Warning + Safe Alternative)
+ */
+const generateSafetyPivotResponse = (safetyData, query) => {
+    const response = `I appreciate you reaching out about your yoga practice! Since you mentioned ${safetyData.detectedCondition}, I want to make sure you stay safe.
+
+${safetyData.reason}
+
+💡 **Safe Alternative:** ${safetyData.modification}
+
+These gentler practices can still provide wonderful benefits while keeping you comfortable and safe. Please consult with your healthcare provider or a certified yoga therapist before trying any new practice. They can give you personalized guidance that's just right for your situation. 🙏`;
+
+    return response;
+};
+
+module.exports = {
+    checkSafetyWithLLM,
+    generateSafetyPivotResponse,
+};

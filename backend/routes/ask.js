@@ -148,22 +148,47 @@ router.post("/", async (req, res) => {
 
     // Step 4: Generate Response
     console.log("🤖 Generating AI response...");
-    const answer = await generateResponse(
-      query,
-      retrievedChunks,
-      safetyCheck.isUnsafe,
-      safetyCheck.keywords
-    );
-    console.log("   ✅ Response generated");
-
-    // Step 5: Prepare Safety Information
+    let answer;
     let safetyMessage = null;
     let safeAlternatives = [];
 
     if (safetyCheck.isUnsafe) {
-      safetyMessage = generateSafetyMessage(safetyCheck.categories);
-      safeAlternatives = getSafeAlternatives(safetyCheck.categories);
+      // Use Smart Safety Pivot - Generate context-aware safe alternative
+      console.log("🛡️ Using Smart Safety Pivot for unsafe query...");
+
+      // Import smart safety module
+      const { checkSafetyWithLLM, generateSafetyPivotResponse } = require("../services/smart-safety");
+
+      // Get LLM-based safety analysis with specific alternatives
+      const smartSafetyData = await checkSafetyWithLLM(query);
+
+      if (smartSafetyData && smartSafetyData.isUnsafe) {
+        // Generate pivot response with safe alternative
+        answer = generateSafetyPivotResponse(smartSafetyData, query);
+        safetyMessage = smartSafetyData.reason;
+        safeAlternatives = [smartSafetyData.modification];
+        console.log(`   ✅ Smart pivot response generated`);
+      } else {
+        // Fallback to regular generation with safety context
+        answer = await generateResponse(
+          query,
+          retrievedChunks,
+          safetyCheck.isUnsafe,
+          safetyCheck.keywords
+        );
+        safetyMessage = generateSafetyMessage(safetyCheck.categories);
+        safeAlternatives = getSafeAlternatives(safetyCheck.categories);
+      }
+    } else {
+      // Normal response generation for safe queries
+      answer = await generateResponse(
+        query,
+        retrievedChunks,
+        safetyCheck.isUnsafe,
+        safetyCheck.keywords
+      );
     }
+    console.log("   ✅ Response generated");
 
     // Step 6: Log to MongoDB
     const responseTime = Date.now() - startTime;

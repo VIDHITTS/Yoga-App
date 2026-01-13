@@ -1,68 +1,200 @@
-# 🛠️ AI Tools & Prompts Documentation
+# AI Prompts & Tools Documentation
 
-This document transparently outlines the AI tools and prompts used during the development of the **Wellness RAG Micro-App**. 
+This document lists all AI prompts, tools, and techniques used to build the **Yoga Wellness RAG Micro-App**.
 
-> **Policy Statement:** AI assistance (Google Gemini) was strictly limited to **data formatting**, **generating boilerplate UI code**, and **brainstorming safety keywords**. The core RAG architecture, embedding strategy (Xenova), and final safety logic were implemented and verified manually to ensure system robustness.
-
----
-
-## 1. Knowledge Base Preparation (Human-in-the-Loop)
-
-**Tool:** Google Gemini
-**Purpose:** To format raw, authoritative text from the *Ministry of Ayush Yoga Protocol* into clean, consistent JSON/Text files for the RAG pipeline.
-
-**Prompt Used:**
-> "I have raw text for the yoga pose 'Tadasana' from the official protocol. Please format it into a clean structure with these specific headers: 'Technique', 'Benefits', 'Contraindications', and 'Breathing'. Do NOT summarize or change the medical facts, just fix the indentation and line breaks."
-
-*Verification:* All generated data was manually reviewed against the original PDF to ensure zero hallucinations regarding medical contraindications.
+> **Transparency:** AI assistance was used for code scaffolding, data formatting, and brainstorming. Core RAG architecture, safety logic, and prompt engineering were designed and verified manually.
 
 ---
 
-## 2. Embedding Strategy & RAG Logic
+## 1. Knowledge Base Preparation
 
-**Tool:** Hugging Face (`@xenova/transformers`)
-**Model:** `all-MiniLM-L6-v2`
-**Purpose:** Implementation of local, cost-effective embeddings instead of relying on external paid APIs.
+**Tool:** Google Gemini  
+**Purpose:** Format raw text from Ministry of Ayush Yoga Protocol into structured JSON.
 
-**Implementation Details:**
-AI was not used to write the core logic. I chose `Xenova` to run embeddings locally within the Node.js environment for lower latency and zero cost.
-
-**Boilerplate Assistance (Gemini):**
-> "Show me the syntax for initializing a `feature-extraction` pipeline using `@xenova/transformers` in a Node.js environment. I need to convert text chunks into vector arrays."
-
----
-
-## 3. Safety Guardrails (Hybrid Approach)
-
-**Tool:** Google Gemini
-**Purpose:** To brainstorm a comprehensive list of medical keywords for the heuristic safety filter.
-
-**Prompt Used:**
-> "Generate a list of 30 common medical keywords that should trigger a safety warning in a fitness application. Include terms related to pregnancy (trimesters), cardiovascular issues (angina, high bp), and acute injuries (hernia, fracture). Output as a raw string array."
-
-*Refinement:* I manually filtered this list to remove generic terms (like "tired") to prevent false positives in the application.
+**Prompt:**
+```
+I have raw text for the yoga pose 'Tadasana' from the official protocol. Format it into clean JSON with these fields:
+- id, title, info, precautions, source, page
+Do NOT summarize or alter medical facts, just structure the data.
+```
 
 ---
 
-## 4. Frontend UI Scaffolding
+## 2. RAG Response Generation
 
-**Tool:** Google Gemini
-**Purpose:** To rapidly generate React component structures and CSS for the "Medical Warning" banner.
+**Tool:** Groq API (LLaMA 3.3 70B)  
+**Purpose:** Generate natural, context-aware yoga guidance.
 
-**Prompt Used:**
-> "Create a React component snippet that takes a `isUnsafe` prop. If true, display a red alert box with a warning icon. If false, display the children components. Use inline styles for a clean, minimal look."
+### Safe Query Prompt:
+```
+You are a friendly, knowledgeable yoga guide having a natural conversation.
+
+Reference Material:
+{retrieved_chunks}
+
+User's Question: {query}
+
+RESPOND NATURALLY:
+- Write like you're explaining to a curious friend
+- Use flowing, natural sentences
+- Keep it conversational and warm (100-120 words)
+- Mention source names naturally when relevant
+- Never give medical advice
+
+Write your response:
+```
+
+### Unsafe Query Prompt:
+```
+You are a warm, knowledgeable yoga wellness guide speaking naturally to a friend.
+
+IMPORTANT: The user mentioned these health conditions: {safety_keywords}
+
+Reference Material:
+{retrieved_chunks}
+
+User's Question: {query}
+
+RESPOND NATURALLY:
+- Acknowledge their health situation with empathy first
+- Share gentle, safe practices they CAN try
+- Use simple, everyday English
+- Keep it friendly and encouraging (100-120 words)
+- End warmly with a reminder to check with their doctor
+
+Write your response:
+```
 
 ---
 
-## 5. Technology Stack Summary
+## 3. Smart Safety Pivot (LLM-Based)
 
-| Component | Technology / Tool | Choice Rationale |
-| :--- | :--- | :--- |
-| **Embeddings** | **Xenova/Transformers** (Hugging Face) | Zero cost, runs locally, no API latency. |
-| **Vector DB** | **Pinecone** | Serverless scalability and fast retrieval. |
-| **Backend** | **Node.js + Express** | Non-blocking I/O ideal for handling RAG requests. |
-| **Code Assist** | **Google Gemini** | Used for regex patterns, data formatting, and CSS modules. |
+**Tool:** Groq API  
+**Purpose:** Analyze queries for health risks and generate context-aware safe alternatives.
+
+**Prompt:**
+```
+Analyze this yoga-related query for safety risks.
+
+Query: "{query}"
+
+Check for these SAFETY RISKS:
+- Pregnancy / Post-natal / Trimester mentions
+- Surgery, Hernia, Fracture, Injury
+- Heart conditions, High Blood Pressure
+- Glaucoma, Eye problems
+- Chronic conditions (diabetes, epilepsy, vertigo)
+
+RESPOND IN VALID JSON ONLY:
+
+If RISK DETECTED:
+{
+  "isUnsafe": true,
+  "detectedCondition": "brief condition name",
+  "reason": "A gentle 1-sentence explanation of the risk",
+  "modification": "A specific safer alternative practice"
+}
+
+If SAFE:
+{
+  "isUnsafe": false,
+  "detectedCondition": null,
+  "reason": null,
+  "modification": null
+}
+```
 
 ---
 
-*This document serves to meet the "AI Tools & Prompts" requirement of the assignment submission.*
+## 4. Safety Keywords Generation
+
+**Tool:** Google Gemini  
+**Purpose:** Brainstorm comprehensive list of medical keywords for heuristic filter.
+
+**Prompt:**
+```
+Generate a list of 30 common medical keywords that should trigger a safety warning in a fitness app. Include terms for:
+- Pregnancy (trimesters, prenatal, postpartum)
+- Cardiovascular (hypertension, heart condition)
+- Injuries (hernia, fracture, surgery)
+- Chronic conditions (diabetes, epilepsy, glaucoma)
+
+Output as a raw string array.
+```
+
+---
+
+## 5. Frontend UI Components
+
+**Tool:** Google Gemini  
+**Purpose:** Generate React component scaffolding.
+
+**Prompt:**
+```
+Create a React component for a safety warning banner:
+- Full-width bar at the top of the screen
+- Red gradient background for visibility
+- AlertTriangle icon with close button
+- Framer Motion animations for slide-in effect
+- Props: message, isVisible, onClose, autoClose
+```
+
+---
+
+## 6. Technology Stack
+
+| Component | Technology | Rationale |
+|-----------|------------|-----------|
+| **Embeddings** | Xenova/Transformers (all-MiniLM-L6-v2) | Free, runs locally, 384 dimensions |
+| **Vector DB** | Pinecone | Serverless, fast retrieval |
+| **LLM** | Groq (LLaMA 3.3 70B) | Fast inference, good quality |
+| **Backend** | Node.js + Express | Non-blocking I/O for RAG |
+| **Frontend** | React + Vite + Tailwind | Modern, fast development |
+| **Database** | MongoDB Atlas | Flexible schema for logging |
+
+---
+
+## 7. Development Tools
+
+| Tool | Usage |
+|------|-------|
+| Google Gemini | Code scaffolding, data formatting |
+| Claude | Documentation and prompts |
+
+---
+
+## 8. Research & Conceptual Prompts
+
+### RAG Architecture Research
+**Prompt:**
+```
+Explain the trade-offs between using FAISS (local) vs Pinecone (cloud) for a small-scale RAG application with ~100 documents. What are the latency, cost, and maintenance considerations?
+```
+
+### Chunking Strategy
+**Prompt:**
+```
+What is the optimal chunk size for yoga-related content when using all-MiniLM-L6-v2 embeddings? Should I use fixed-size chunking or semantic chunking for instructional content?
+```
+
+### Safety System Design
+**Prompt:**
+```
+Compare keyword-based safety detection vs LLM-based classification for health-related queries. What are the false positive/negative trade-offs? When should I use a hybrid approach?
+```
+
+### MongoDB Schema Design
+**Prompt:**
+```
+What fields should I log for a RAG chatbot to enable future analytics? Consider: query patterns, retrieval quality metrics, response latency, and user feedback tracking.
+```
+
+### Prompt Engineering Best Practices
+**Prompt:**
+```
+How do I prevent an LLM from hallucinating medical advice while still being helpful? What guardrails should I include in the system prompt for a wellness application?
+```
+
+---
+
+*This document fulfills the "AI Tools & Prompts" requirement for submission.*
