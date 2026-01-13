@@ -1,9 +1,5 @@
 # 🧘 Yoga Wellness RAG Application
 
-> **Assignment Submission**: Stage 1 - RAG Application Development  
-> **Submitted by**: Vidhitt S  
-> **Repository**: [github.com/VIDHITTS/Yoga-App](https://github.com/VIDHITTS/Yoga-App)
-
 An intelligent Retrieval-Augmented Generation (RAG) system providing safe, evidence-based yoga guidance powered by vector search and AI.
 
 ---
