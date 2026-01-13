@@ -1,7 +1,7 @@
-const Groq = require("groq-sdk");
+const OpenAI = require("openai");
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 /**
@@ -40,9 +40,9 @@ If SAFE:
   "modification": null
 }`;
 
-    const completion = await groq.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: safetyPrompt }],
-      model: "llama-3.3-70b-versatile",
+      model: "gpt-4o-mini",
       temperature: 0.1,
       max_tokens: 256,
     });

@@ -1,12 +1,12 @@
-const Groq = require("groq-sdk");
+const OpenAI = require("openai");
 const { generateFallbackResponse } = require("./fallback-generation");
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 /**
- * Generate answer using Gemini with retrieved context
+ * Generate answer using LLM with retrieved context
  */
 const generateResponse = async (
   query,
@@ -98,28 +98,27 @@ RESPOND NATURALLY:
 Write your response:`;
     }
 
-    // Generate response with Groq (using faster model for quicker responses)
-    const completion = await groq.chat.completions.create({
+    // Generate response with LLM
+    const completion = await openai.chat.completions.create({
       messages: [
         {
           role: "user",
           content: prompt,
         },
       ],
-      model: "llama-3.1-8b-instant", // Faster model for quicker responses
+      model: "gpt-4o-mini",
       temperature: 0.3,
-      max_tokens: 300, // Reduced for faster response
-      top_p: 0.9,
+      max_tokens: 300,
     });
 
     const answer =
       completion.choices[0]?.message?.content || "Unable to generate response.";
     return answer;
   } catch (error) {
-    console.error("❌ Groq API Error:", error.message);
+    console.error("❌ LLM API Error:", error.message);
     console.log("🔄 Using fallback response generator...");
 
-    // Use fallback when Groq API fails (quota, network, etc.)
+    // Use fallback when API fails
     const fallbackAnswer = generateFallbackResponse(
       query,
       retrievedChunks,
