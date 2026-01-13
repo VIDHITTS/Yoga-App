@@ -2,7 +2,7 @@ const Groq = require("groq-sdk");
 const { generateFallbackResponse } = require("./fallback-generation");
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 /**
@@ -16,8 +16,32 @@ const generateResponse = async (
 ) => {
   try {
     // STRICT PRE-CHECK: Only answer yoga-related questions
-    const yogaKeywords = ['yoga', 'asana', 'pose', 'pranayama', 'meditation', 'breathing', 'namaste', 'chakra', 'mindfulness', 'stretch', 'flexibility', 'wellness', 'practice', 'spiritual', 'exercise', 'surya', 'namaskar', 'shavasana', 'tadasana', 'pregnant', 'pregnancy'];
-    const isYogaRelated = yogaKeywords.some(keyword => query.toLowerCase().includes(keyword));
+    const yogaKeywords = [
+      "yoga",
+      "asana",
+      "pose",
+      "pranayama",
+      "meditation",
+      "breathing",
+      "namaste",
+      "chakra",
+      "mindfulness",
+      "stretch",
+      "flexibility",
+      "wellness",
+      "practice",
+      "spiritual",
+      "exercise",
+      "surya",
+      "namaskar",
+      "shavasana",
+      "tadasana",
+      "pregnant",
+      "pregnancy",
+    ];
+    const isYogaRelated = yogaKeywords.some((keyword) =>
+      query.toLowerCase().includes(keyword)
+    );
 
     if (!isYogaRelated && query.trim().length < 50) {
       return "Hey there! I'm your yoga wellness guide. I can help with poses, breathing techniques, meditation, and more. What would you like to explore today?";
@@ -36,7 +60,9 @@ const generateResponse = async (
     if (isUnsafe) {
       prompt = `You are a warm, knowledgeable yoga wellness guide speaking naturally to a friend.
 
-IMPORTANT: The user mentioned these health conditions: ${safetyKeywords.join(", ")}
+IMPORTANT: The user mentioned these health conditions: ${safetyKeywords.join(
+        ", "
+      )}
 
 Reference Material:
 ${contextText}
@@ -77,8 +103,8 @@ Write your response:`;
       messages: [
         {
           role: "user",
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
       model: "llama-3.3-70b-versatile",
       temperature: 0.3,
@@ -86,7 +112,8 @@ Write your response:`;
       top_p: 0.95,
     });
 
-    const answer = completion.choices[0]?.message?.content || "Unable to generate response.";
+    const answer =
+      completion.choices[0]?.message?.content || "Unable to generate response.";
     return answer;
   } catch (error) {
     console.error("❌ Groq API Error:", error.message);

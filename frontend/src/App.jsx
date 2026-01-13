@@ -1,17 +1,30 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sun, Sparkles, User, Bot, ThumbsUp, ThumbsDown, Loader2 } from 'lucide-react';
-import WarningBanner from './components/ui/WarningBanner';
-import { askQuestion, submitFeedback } from './services/api';
-import './App.css';
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send,
+  Sun,
+  Sparkles,
+  User,
+  Bot,
+  ThumbsUp,
+  ThumbsDown,
+  Loader2,
+} from "lucide-react";
+import WarningBanner from "./components/ui/WarningBanner";
+import { askQuestion, submitFeedback } from "./services/api";
+import "./App.css";
 
 function App() {
   const [showWarning, setShowWarning] = useState(false);
-  const [warningMessage, setWarningMessage] = useState('');
-  const [inputMessage, setInputMessage] = useState('');
+  const [warningMessage, setWarningMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, sender: 'ai', text: 'Namaste. I am your yoga wellness guide. Ask me anything about yoga!' }
+    {
+      id: 1,
+      sender: "ai",
+      text: "Namaste. I am your yoga wellness guide. Ask me anything about yoga!",
+    },
   ]);
   const messagesEndRef = useRef(null);
 
@@ -28,10 +41,10 @@ function App() {
     if (!inputMessage.trim() || isLoading) return;
 
     // Add User Message
-    const newUserMsg = { id: Date.now(), sender: 'user', text: inputMessage };
-    setMessages(prev => [...prev, newUserMsg]);
+    const newUserMsg = { id: Date.now(), sender: "user", text: inputMessage };
+    setMessages((prev) => [...prev, newUserMsg]);
     const query = inputMessage;
-    setInputMessage('');
+    setInputMessage("");
     setIsLoading(true);
 
     try {
@@ -41,23 +54,30 @@ function App() {
       // Add AI response with sources and queryId for feedback
       const newAiMsg = {
         id: Date.now() + 1,
-        sender: 'ai',
+        sender: "ai",
         text: response.answer,
         sources: response.sources || [],
         queryId: response.queryId,
-        feedbackGiven: null // null = not given, true = helpful, false = not helpful
+        feedbackGiven: null, // null = not given, true = helpful, false = not helpful
       };
-      setMessages(prev => [...prev, newAiMsg]);
+      setMessages((prev) => [...prev, newAiMsg]);
 
       // Show safety warning if query was unsafe
-      console.log('Safety response:', response.safety); // DEBUG
+      console.log("Safety response:", response.safety); // DEBUG
       if (response.safety && response.safety.isUnsafe) {
-        setWarningMessage(response.safety.message || 'Please consult a healthcare professional for personalized guidance.');
+        setWarningMessage(
+          response.safety.message ||
+            "Please consult a healthcare professional for personalized guidance."
+        );
         setShowWarning(true);
       }
     } catch (error) {
-      const errorMsg = { id: Date.now() + 1, sender: 'ai', text: 'Sorry, I encountered an error. Please try again.' };
-      setMessages(prev => [...prev, errorMsg]);
+      const errorMsg = {
+        id: Date.now() + 1,
+        sender: "ai",
+        text: "Sorry, I encountered an error. Please try again.",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -67,24 +87,31 @@ function App() {
     try {
       await submitFeedback(queryId, helpful);
       // Update message to show feedback was given
-      setMessages(prev => prev.map(msg =>
-        msg.id === messageId ? { ...msg, feedbackGiven: helpful } : msg
-      ));
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId ? { ...msg, feedbackGiven: helpful } : msg
+        )
+      );
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      console.error("Failed to submit feedback:", error);
     }
   };
 
   return (
     <div className="flex flex-col h-screen w-full bg-yoga-cream text-yoga-dark font-sans relative overflow-hidden selection:bg-yoga-sage/30">
-
       {/* Decorative Background Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[50vh] h-[50vh] rounded-full bg-yoga-sage/10 blur-[100px] pointer-events-none animate-float" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[60vh] h-[60vh] rounded-full bg-yoga-terra/10 blur-[120px] pointer-events-none animate-float" style={{ animationDelay: '-3s' }} />
+      <div
+        className="absolute bottom-[-10%] right-[-10%] w-[60vh] h-[60vh] rounded-full bg-yoga-terra/10 blur-[120px] pointer-events-none animate-float"
+        style={{ animationDelay: "-3s" }}
+      />
 
       <WarningBanner
         isVisible={showWarning}
-        message={warningMessage || "⚠️ This query involves health conditions. Please consult a healthcare provider."}
+        message={
+          warningMessage ||
+          "⚠️ This query involves health conditions. Please consult a healthcare provider."
+        }
         onClose={() => setShowWarning(false)}
         autoClose={15000}
       />
@@ -119,67 +146,104 @@ function App() {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className={`flex w-full ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex w-full ${
+                msg.sender === "user" ? "justify-end" : "justify-start"
+              }`}
             >
-              <div className={`flex max-w-[85%] md:max-w-[70%] gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div
+                className={`flex max-w-[85%] md:max-w-[70%] gap-3 ${
+                  msg.sender === "user" ? "flex-row-reverse" : "flex-row"
+                }`}
+              >
                 {/* Avatar */}
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 shadow-sm ${msg.sender === 'user' ? 'bg-yoga-terra text-white' : 'bg-white text-yoga-sage'
-                  }`}>
-                  {msg.sender === 'user' ? <User size={16} /> : <Bot size={16} />}
+                <div
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 shadow-sm ${
+                    msg.sender === "user"
+                      ? "bg-yoga-terra text-white"
+                      : "bg-white text-yoga-sage"
+                  }`}
+                >
+                  {msg.sender === "user" ? (
+                    <User size={16} />
+                  ) : (
+                    <Bot size={16} />
+                  )}
                 </div>
 
                 {/* Bubble + Sources + Feedback */}
-                <div className={`flex flex-col gap-2 ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                <div
+                  className={`flex flex-col gap-2 ${
+                    msg.sender === "user" ? "items-end" : "items-start"
+                  }`}
+                >
                   {/* Message Bubble */}
-                  <div className={`p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed ${msg.sender === 'user'
-                    ? 'bg-yoga-sage text-white rounded-tr-none'
-                    : 'bg-white/80 backdrop-blur-sm text-yoga-dark border border-white/50 rounded-tl-none'
-                    }`}>
+                  <div
+                    className={`p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed ${
+                      msg.sender === "user"
+                        ? "bg-yoga-sage text-white rounded-tr-none"
+                        : "bg-white/80 backdrop-blur-sm text-yoga-dark border border-white/50 rounded-tl-none"
+                    }`}
+                  >
                     {msg.text}
                   </div>
 
                   {/* Sources Section - Only for AI messages with sources */}
-                  {msg.sender === 'ai' && msg.sources && msg.sources.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="bg-white/50 border border-white/60 p-3 rounded-xl text-xs w-full"
-                    >
-                      <p className="font-semibold text-yoga-sage mb-2 flex items-center gap-1">
-                        <Sparkles size={10} /> Sources Used:
-                      </p>
-                      <div className="space-y-1.5">
-                        {msg.sources.map((source, idx) => (
-                          <div key={idx} className="flex flex-col gap-0.5 pl-2 border-l-2 border-yoga-sage/30">
-                            <span className="font-medium text-yoga-dark/80">{source.title}</span>
-                            <span className="text-[10px] text-yoga-dark/50">Source: {source.source}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
+                  {msg.sender === "ai" &&
+                    msg.sources &&
+                    msg.sources.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-white/50 border border-white/60 p-3 rounded-xl text-xs w-full"
+                      >
+                        <p className="font-semibold text-yoga-sage mb-2 flex items-center gap-1">
+                          <Sparkles size={10} /> Sources Used:
+                        </p>
+                        <div className="space-y-1.5">
+                          {msg.sources.map((source, idx) => (
+                            <div
+                              key={idx}
+                              className="flex flex-col gap-0.5 pl-2 border-l-2 border-yoga-sage/30"
+                            >
+                              <span className="font-medium text-yoga-dark/80">
+                                {source.title}
+                              </span>
+                              <span className="text-[10px] text-yoga-dark/50">
+                                Source: {source.source}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
 
                   {/* Feedback Section - Only for AI messages with queryId */}
-                  {msg.sender === 'ai' && msg.queryId && (
+                  {msg.sender === "ai" && msg.queryId && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
                       className="flex items-center gap-2 text-xs"
                     >
-                      <span className="text-yoga-dark/50">Was this helpful?</span>
+                      <span className="text-yoga-dark/50">
+                        Was this helpful?
+                      </span>
                       {msg.feedbackGiven === null ? (
                         <>
                           <button
-                            onClick={() => handleFeedback(msg.id, msg.queryId, true)}
+                            onClick={() =>
+                              handleFeedback(msg.id, msg.queryId, true)
+                            }
                             className="p-1.5 rounded-full hover:bg-green-100 text-yoga-dark/40 hover:text-green-600 transition-colors"
                             title="Helpful"
                           >
                             <ThumbsUp size={14} />
                           </button>
                           <button
-                            onClick={() => handleFeedback(msg.id, msg.queryId, false)}
+                            onClick={() =>
+                              handleFeedback(msg.id, msg.queryId, false)
+                            }
                             className="p-1.5 rounded-full hover:bg-red-100 text-yoga-dark/40 hover:text-red-500 transition-colors"
                             title="Not helpful"
                           >
@@ -187,8 +251,16 @@ function App() {
                           </button>
                         </>
                       ) : (
-                        <span className={`text-xs font-medium ${msg.feedbackGiven ? 'text-green-600' : 'text-red-500'}`}>
-                          {msg.feedbackGiven ? '👍 Thanks!' : '👎 Sorry about that'}
+                        <span
+                          className={`text-xs font-medium ${
+                            msg.feedbackGiven
+                              ? "text-green-600"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {msg.feedbackGiven
+                            ? "👍 Thanks!"
+                            : "👎 Sorry about that"}
                         </span>
                       )}
                     </motion.div>
@@ -249,7 +321,6 @@ function App() {
           </p>
         </div>
       </div>
-
     </div>
   );
 }

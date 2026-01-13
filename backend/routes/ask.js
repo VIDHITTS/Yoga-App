@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
     }
 
     console.log(`\n🔍 Processing Query: "${query}"`);
-    
+
     // Step 1: Safety Detection (do this FIRST before boundary check)
     const safetyCheck = detectUnsafeQuery(query);
     console.log(
@@ -47,17 +47,53 @@ router.post("/", async (req, res) => {
       console.log(`   Detected Keywords: ${safetyCheck.keywords.join(", ")}`);
       console.log(`   Categories: ${safetyCheck.categories.join(", ")}`);
     }
-    
+
     // BOUNDARY CHECK: Only answer yoga-related questions (but allow safety queries through)
-    const yogaKeywords = ['yoga', 'asana', 'pose', 'poses', 'pranayama', 'meditation', 'breathing', 'breath', 'namaste', 'chakra', 'mindfulness', 'stretch', 'flexibility', 'wellness', 'practice', 'spiritual', 'exercise', 'exercises', 'surya', 'namaskar', 'shavasana', 'tadasana', 'relaxation', 'health', 'benefits', 'technique', 'techniques', 'recommend', 'suggestion', 'can i', 'should i', 'is it safe'];
-    const isYogaRelated = yogaKeywords.some(keyword => query.toLowerCase().includes(keyword));
-    
+    const yogaKeywords = [
+      "yoga",
+      "asana",
+      "pose",
+      "poses",
+      "pranayama",
+      "meditation",
+      "breathing",
+      "breath",
+      "namaste",
+      "chakra",
+      "mindfulness",
+      "stretch",
+      "flexibility",
+      "wellness",
+      "practice",
+      "spiritual",
+      "exercise",
+      "exercises",
+      "surya",
+      "namaskar",
+      "shavasana",
+      "tadasana",
+      "relaxation",
+      "health",
+      "benefits",
+      "technique",
+      "techniques",
+      "recommend",
+      "suggestion",
+      "can i",
+      "should i",
+      "is it safe",
+    ];
+    const isYogaRelated = yogaKeywords.some((keyword) =>
+      query.toLowerCase().includes(keyword)
+    );
+
     // Allow through if it's yoga-related OR if it's a safety-flagged query (health conditions asking about yoga)
     if (!isYogaRelated && !safetyCheck.isUnsafe && query.trim().length < 100) {
       console.log("⛔ Non-yoga query detected - rejecting");
-      
-      const rejectionMessage = "I'm a yoga wellness assistant and can only answer questions about yoga practice, poses, breathing techniques, and meditation. Please ask me something related to yoga!";
-      
+
+      const rejectionMessage =
+        "I'm a yoga wellness assistant and can only answer questions about yoga practice, poses, breathing techniques, and meditation. Please ask me something related to yoga!";
+
       // Still log to MongoDB for tracking
       const queryLog = new QueryLog({
         query: query.trim(),
@@ -74,7 +110,7 @@ router.post("/", async (req, res) => {
 
       await queryLog.save();
       console.log(`📝 Query logged to MongoDB (ID: ${queryLog._id})`);
-      
+
       return res.json({
         success: true,
         queryId: queryLog._id,

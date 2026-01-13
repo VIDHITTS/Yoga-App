@@ -1,8 +1,8 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, X } from "lucide-react";
+import { useEffect } from "react";
 
-const WarningBanner = ({ message, isVisible, onClose, autoClose = 5000 }) => {
+const WarningBanner = ({ message, isVisible, onClose, autoClose = 15000 }) => {
     useEffect(() => {
         if (isVisible && autoClose) {
             const timer = setTimeout(onClose, autoClose);
@@ -14,37 +14,27 @@ const WarningBanner = ({ message, isVisible, onClose, autoClose = 5000 }) => {
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ opacity: 0, y: -50, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none"
+                    initial={{ opacity: 0, y: -100 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -100 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    className="fixed top-0 left-0 right-0 z-50"
                 >
-                    {/* The notification card itself */}
-                    <motion.div
-                        className="pointer-events-auto bg-white/90 backdrop-blur-md border-l-4 border-amber-500 shadow-lg rounded-r-lg p-4 flex items-start gap-3"
-                        whileHover={{ scale: 1.02 }}
-                        animate={{
-                            rotate: [0, -1, 1, -1, 0],
-                            transition: { duration: 0.5, delay: 0.2 }
-                        }} // Subtle shake on entry
-                    >
-                        <div className="flex-shrink-0 text-amber-500 mt-1">
-                            <AlertCircle size={24} />
+                    {/* Full-width warning bar at the very top */}
+                    <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-4 py-3 shadow-lg">
+                        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <AlertTriangle size={20} className="flex-shrink-0" />
+                                <p className="text-sm font-medium leading-snug">{message}</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="flex-shrink-0 p-1 rounded-full hover:bg-white/20 transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
-                        <div className="flex-1">
-                            <h3 className="text-sm font-semibold text-gray-900">Attention Needed</h3>
-                            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                                {message}
-                            </p>
-                        </div>
-                        <button
-                            onClick={onClose}
-                            className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <X size={20} />
-                        </button>
-                    </motion.div>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>

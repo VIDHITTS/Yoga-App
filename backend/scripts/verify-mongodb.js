@@ -17,14 +17,16 @@ async function verifyMongoDBLogging() {
     }
 
     console.log("📊 LATEST QUERY LOG VERIFICATION");
-    console.log("=" .repeat(70));
+    console.log("=".repeat(70));
     console.log("\n✅ USER QUERY:");
     console.log(`   "${latestQuery.query}"`);
-    
+
     console.log("\n✅ RETRIEVED CHUNKS:");
     console.log(`   Count: ${latestQuery.retrievedChunks.length}`);
     latestQuery.retrievedChunks.forEach((chunk, idx) => {
-      console.log(`   ${idx + 1}. ${chunk.title} (score: ${chunk.score.toFixed(4)})`);
+      console.log(
+        `   ${idx + 1}. ${chunk.title} (score: ${chunk.score.toFixed(4)})`
+      );
     });
 
     console.log("\n✅ FINAL AI ANSWER:");
@@ -35,7 +37,9 @@ async function verifyMongoDBLogging() {
     console.log(`   Is Unsafe: ${latestQuery.isUnsafe}`);
     if (latestQuery.isUnsafe) {
       console.log(`   Keywords: ${latestQuery.safetyKeywords.join(", ")}`);
-      console.log(`   Message: ${latestQuery.safetyMessage?.substring(0, 80)}...`);
+      console.log(
+        `   Message: ${latestQuery.safetyMessage?.substring(0, 80)}...`
+      );
     }
 
     console.log("\n✅ TIMESTAMPS:");
@@ -44,12 +48,16 @@ async function verifyMongoDBLogging() {
 
     console.log("\n✅ ADDITIONAL DATA:");
     console.log(`   Model: ${latestQuery.model}`);
-    console.log(`   Embedding Dimensions: ${latestQuery.embedding?.length || 0}`);
+    console.log(
+      `   Embedding Dimensions: ${latestQuery.embedding?.length || 0}`
+    );
     console.log(`   IP Address: ${latestQuery.ipAddress}`);
     console.log(`   User Agent: ${latestQuery.userAgent?.substring(0, 50)}...`);
 
     console.log("\n✅ FEEDBACK:");
-    console.log(`   Helpful: ${latestQuery.feedback?.helpful ?? 'Not yet provided'}`);
+    console.log(
+      `   Helpful: ${latestQuery.feedback?.helpful ?? "Not yet provided"}`
+    );
 
     console.log("\n" + "=".repeat(70));
     console.log("✅ ALL ASSIGNMENT REQUIREMENTS SATISFIED!");
