@@ -1,90 +1,149 @@
-import React, { useState } from "react";
-import QueryInput from "./components/QueryInput";
-import ResponseDisplay from "./components/ResponseDisplay";
-import { askQuestion } from "./services/api";
-import "./App.css";
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Sun, Sparkles, User, Bot } from 'lucide-react';
+import WarningBanner from './components/ui/WarningBanner';
+import './App.css';
 
 function App() {
-  const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState(null);
-  const [error, setError] = useState(null);
+  const [showWarning, setShowWarning] = useState(false);
+  const [inputMessage, setInputMessage] = useState('');
+  const [messages, setMessages] = useState([
+    { id: 1, sender: 'ai', text: 'Namaste. I am your yoga wellness guide. How is your posture feeling today?' }
+  ]);
+  const messagesEndRef = useRef(null);
 
-  const handleQuery = async (query) => {
-    setLoading(true);
-    setError(null);
-    setResponse(null);
-
-    try {
-      const data = await askQuestion(query);
-      setResponse(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleNewQuery = () => {
-    setResponse(null);
-    setError(null);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (!inputMessage.trim()) return;
+
+    // Add User Message
+    const newUserMsg = { id: Date.now(), sender: 'user', text: inputMessage };
+    setMessages(prev => [...prev, newUserMsg]);
+    setInputMessage('');
+
+    // Simulate AI Response (and potentially a warning for demo purposes)
+    setTimeout(() => {
+      const aiResponses = [
+        "Remember to keep your spine straight and shoulders relaxed.",
+        "That's a great question. Let's focus on your breathing.",
+        "I can help you adjust that pose. Could you describe any discomfort?",
+        "Mindfulness is key to this practice."
+      ];
+      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+
+      const newAiMsg = { id: Date.now() + 1, sender: 'ai', text: randomResponse };
+      setMessages(prev => [...prev, newAiMsg]);
+
+      // Demo logic: If user types "posture" or "pain", trigger the warning
+      if (inputMessage.toLowerCase().includes('pain') || inputMessage.toLowerCase().includes('posture')) {
+        setShowWarning(true);
+      }
+    }, 1000);
   };
 
   return (
-    <div className="app">
-      <div className="app-container">
-        {/* Header */}
-        <header className="app-header">
-          <div className="logo-section">
-            <span className="logo-icon">🧘‍♀️</span>
-            <span className="logo-text">Yoga Wellness Assistant</span>
+    <div className="flex flex-col h-screen w-full bg-yoga-cream text-yoga-dark font-sans relative overflow-hidden selection:bg-yoga-sage/30">
+
+      {/* Decorative Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50vh] h-[50vh] rounded-full bg-yoga-sage/10 blur-[100px] pointer-events-none animate-float" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60vh] h-[60vh] rounded-full bg-yoga-terra/10 blur-[120px] pointer-events-none animate-float" style={{ animationDelay: '-3s' }} />
+
+      <WarningBanner
+        isVisible={showWarning}
+        message="Gentle reminder: Please correct your posture to avoid strain."
+        onClose={() => setShowWarning(false)}
+      />
+
+      {/* Header */}
+      <header className="flex-shrink-0 p-4 md:p-6 flex items-center justify-between z-10 bg-white/30 backdrop-blur-md border-b border-white/50">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-full bg-yoga-sage/20 text-yoga-sage">
+            <Sun size={24} />
           </div>
-          <div className="header-badge">Powered by AI & Ayush Protocol</div>
-        </header>
+          <div>
+            <h1 className="font-display text-xl font-semibold tracking-wide text-yoga-dark">
+              Yoga<span className="text-yoga-sage italic">Flow</span>
+            </h1>
+            <p className="text-xs text-yoga-dark/60">Wellness Assistant</p>
+          </div>
+        </div>
 
-        {/* Main Content */}
-        <main className="main-content">
-          {!response && !loading && (
-            <QueryInput onSubmit={handleQuery} isLoading={loading} />
-          )}
+        {/* Subtle Status Indicator */}
+        <div className="flex items-center gap-2 text-xs font-medium text-yoga-sage bg-yoga-sage/10 px-3 py-1 rounded-full">
+          <Sparkles size={12} />
+          <span>AI Active</span>
+        </div>
+      </header>
 
-          {loading && (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text">
-                Searching knowledge base and generating answer...
-              </p>
-              <p className="loading-subtext">This usually takes 2-3 seconds</p>
-            </div>
-          )}
+      {/* Chat Area */}
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 z-10 scroll-smooth">
+        <AnimatePresence initial={false}>
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className={`flex w-full ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`flex max-w-[85%] md:max-w-[70%] gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                {/* Avatar */}
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 shadow-sm ${msg.sender === 'user' ? 'bg-yoga-terra text-white' : 'bg-white text-yoga-sage'
+                  }`}>
+                  {msg.sender === 'user' ? <User size={16} /> : <Bot size={16} />}
+                </div>
 
-          {error && (
-            <div className="error-container">
-              <div className="error-icon">❌</div>
-              <h3 className="error-title">Something went wrong</h3>
-              <p className="error-message">{error}</p>
-              <button onClick={handleNewQuery} className="error-button">
-                Try Again
-              </button>
-            </div>
-          )}
+                {/* Bubble */}
+                <div className={`p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed ${msg.sender === 'user'
+                    ? 'bg-yoga-sage text-white rounded-tr-none'
+                    : 'bg-white/80 backdrop-blur-sm text-yoga-dark border border-white/50 rounded-tl-none'
+                  }`}>
+                  {msg.text}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
+      </main>
 
-          {response && !loading && (
-            <ResponseDisplay response={response} onNewQuery={handleNewQuery} />
-          )}
-        </main>
-
-        {/* Footer */}
-        <footer className="app-footer">
-          <p className="footer-text">
-            Built with ❤️ using RAG technology • Knowledge from Ministry of
-            Ayush, Govt. of India
+      {/* Input Area */}
+      <div className="flex-shrink-0 p-4 md:p-6 z-20">
+        <form
+          onSubmit={handleSendMessage}
+          className="max-w-4xl mx-auto relative flex items-center gap-2"
+        >
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Ask about a pose, breathing, or your session..."
+            className="w-full bg-white/60 backdrop-blur-md border border-white/60 focus:border-yoga-sage text-yoga-dark placeholder:text-yoga-dark/40 rounded-full py-4 pl-6 pr-14 shadow-sm focus:ring-2 focus:ring-yoga-sage/20 outline-none transition-all duration-300"
+          />
+          <button
+            type="button"
+            className="absolute right-2 p-3 bg-yoga-sage hover:bg-yoga-sage/90 text-white rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
+            onClick={handleSendMessage}
+            disabled={!inputMessage.trim()}
+          >
+            <Send size={20} />
+          </button>
+        </form>
+        <div className="text-center mt-2">
+          <p className="text-[10px] text-yoga-dark/30">
+            AI can make mistakes. Listen to your body first.
           </p>
-          <p className="footer-disclaimer">
-            This application provides educational information only. Always
-            consult healthcare professionals for medical advice.
-          </p>
-        </footer>
+        </div>
       </div>
+
     </div>
   );
 }
