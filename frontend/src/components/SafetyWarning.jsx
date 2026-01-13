@@ -42,9 +42,16 @@ const SafetyWarning = ({ safety }) => {
       )}
 
       <div className="warning-footer">
+        <div className="consult-box">
+          <span className="consult-icon">👨‍⚕️</span>
+          <p className="consult-text">
+            <strong>Please consult a doctor or certified yoga instructor</strong> before 
+            attempting any yoga practice. They can provide personalized guidance based on 
+            your specific health condition.
+          </p>
+        </div>
         <p className="footer-text">
-          ⓘ This information is educational. Always consult qualified healthcare
-          professionals and certified yoga therapists for personalized guidance.
+          ⓘ This information is educational only and not medical advice.
         </p>
       </div>
     </div>

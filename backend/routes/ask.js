@@ -157,7 +157,7 @@ router.post("/", async (req, res) => {
       console.log("🛡️ Using Smart Safety Pivot for unsafe query...");
 
       // Import smart safety module
-      const { checkSafetyWithLLM, generateSafetyPivotResponse } = require("../services/smart-safety");
+      const { checkSafetyWithLLM, generateSafetyPivotResponse, generateSmartSafetyMessage } = require("../services/smart-safety");
 
       // Get LLM-based safety analysis with specific alternatives
       const smartSafetyData = await checkSafetyWithLLM(query);
@@ -165,7 +165,7 @@ router.post("/", async (req, res) => {
       if (smartSafetyData && smartSafetyData.isUnsafe) {
         // Generate pivot response with safe alternative
         answer = generateSafetyPivotResponse(smartSafetyData, query);
-        safetyMessage = smartSafetyData.reason;
+        safetyMessage = generateSmartSafetyMessage(smartSafetyData);
         safeAlternatives = [smartSafetyData.modification];
         console.log(`   ✅ Smart pivot response generated`);
       } else {

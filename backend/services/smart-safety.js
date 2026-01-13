@@ -73,12 +73,20 @@ ${safetyData.reason}
 
 💡 **Safe Alternative:** ${safetyData.modification}
 
-These gentler practices can still provide wonderful benefits while keeping you comfortable and safe. Please consult with your healthcare provider or a certified yoga therapist before trying any new practice. They can give you personalized guidance that's just right for your situation. 🙏`;
+These gentler practices can still provide wonderful benefits while keeping you comfortable and safe. 🙏`;
 
     return response;
+};
+
+/**
+ * Generate safety message with doctor/instructor consultation advice
+ */
+const generateSmartSafetyMessage = (safetyData) => {
+    return `⚠️ ${safetyData.reason}\n\n👨‍⚕️ Please consult a doctor or certified yoga instructor before attempting any yoga practice. They can provide personalized guidance based on your specific health condition.`;
 };
 
 module.exports = {
     checkSafetyWithLLM,
     generateSafetyPivotResponse,
+    generateSmartSafetyMessage,
 };
