@@ -37,11 +37,23 @@ router.post("/", async (req, res) => {
 
     console.log(`\n🔍 Processing Query: "${query}"`);
     
-    // STRICT BOUNDARY CHECK: Only answer yoga-related questions
-    const yogaKeywords = ['yoga', 'asana', 'pose', 'poses', 'pranayama', 'meditation', 'breathing', 'breath', 'namaste', 'chakra', 'mindfulness', 'stretch', 'flexibility', 'wellness', 'practice', 'spiritual', 'exercise', 'exercises', 'surya', 'namaskar', 'shavasana', 'tadasana', 'relaxation', 'health', 'benefits', 'technique', 'techniques'];
+    // Step 1: Safety Detection (do this FIRST before boundary check)
+    const safetyCheck = detectUnsafeQuery(query);
+    console.log(
+      `🛡️  Safety Check: ${safetyCheck.isUnsafe ? "⚠️ UNSAFE" : "✅ SAFE"}`
+    );
+
+    if (safetyCheck.isUnsafe) {
+      console.log(`   Detected Keywords: ${safetyCheck.keywords.join(", ")}`);
+      console.log(`   Categories: ${safetyCheck.categories.join(", ")}`);
+    }
+    
+    // BOUNDARY CHECK: Only answer yoga-related questions (but allow safety queries through)
+    const yogaKeywords = ['yoga', 'asana', 'pose', 'poses', 'pranayama', 'meditation', 'breathing', 'breath', 'namaste', 'chakra', 'mindfulness', 'stretch', 'flexibility', 'wellness', 'practice', 'spiritual', 'exercise', 'exercises', 'surya', 'namaskar', 'shavasana', 'tadasana', 'relaxation', 'health', 'benefits', 'technique', 'techniques', 'recommend', 'suggestion', 'can i', 'should i', 'is it safe'];
     const isYogaRelated = yogaKeywords.some(keyword => query.toLowerCase().includes(keyword));
     
-    if (!isYogaRelated && query.trim().length < 100) {
+    // Allow through if it's yoga-related OR if it's a safety-flagged query (health conditions asking about yoga)
+    if (!isYogaRelated && !safetyCheck.isUnsafe && query.trim().length < 100) {
       console.log("⛔ Non-yoga query detected - rejecting");
       
       const rejectionMessage = "I'm a yoga wellness assistant and can only answer questions about yoga practice, poses, breathing techniques, and meditation. Please ask me something related to yoga!";
@@ -80,17 +92,6 @@ router.post("/", async (req, res) => {
           model: "boundary-check",
         },
       });
-    }
-
-    // Step 1: Safety Detection
-    const safetyCheck = detectUnsafeQuery(query);
-    console.log(
-      `🛡️  Safety Check: ${safetyCheck.isUnsafe ? "⚠️ UNSAFE" : "✅ SAFE"}`
-    );
-
-    if (safetyCheck.isUnsafe) {
-      console.log(`   Detected Keywords: ${safetyCheck.keywords.join(", ")}`);
-      console.log(`   Categories: ${safetyCheck.categories.join(", ")}`);
     }
 
     // Step 2: Generate Embedding
