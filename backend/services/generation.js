@@ -106,9 +106,9 @@ Write your response:`;
           content: prompt,
         },
       ],
-      model: "llama-3.1-8b-instant",  // Faster model for quicker responses
+      model: "llama-3.1-8b-instant", // Faster model for quicker responses
       temperature: 0.3,
-      max_tokens: 300,  // Reduced for faster response
+      max_tokens: 300, // Reduced for faster response
       top_p: 0.9,
     });
 

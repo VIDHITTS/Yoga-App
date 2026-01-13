@@ -1,7 +1,7 @@
 const Groq = require("groq-sdk");
 
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 /**
@@ -9,8 +9,8 @@ const groq = new Groq({
  * Returns structured safety analysis with safe alternatives
  */
 const checkSafetyWithLLM = async (query) => {
-    try {
-        const safetyPrompt = `Analyze this yoga-related query for safety risks.
+  try {
+    const safetyPrompt = `Analyze this yoga-related query for safety risks.
 
 Query: "${query}"
 
@@ -40,34 +40,34 @@ If SAFE:
   "modification": null
 }`;
 
-        const completion = await groq.chat.completions.create({
-            messages: [{ role: "user", content: safetyPrompt }],
-            model: "llama-3.3-70b-versatile",
-            temperature: 0.1,
-            max_tokens: 256,
-        });
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: safetyPrompt }],
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.1,
+      max_tokens: 256,
+    });
 
-        const responseText = completion.choices[0]?.message?.content || "{}";
+    const responseText = completion.choices[0]?.message?.content || "{}";
 
-        // Parse JSON response
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
-        }
-
-        return { isUnsafe: false };
-    } catch (error) {
-        console.error("❌ LLM Safety Check Error:", error.message);
-        // Fallback to keyword-based check
-        return null;
+    // Parse JSON response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
     }
+
+    return { isUnsafe: false };
+  } catch (error) {
+    console.error("❌ LLM Safety Check Error:", error.message);
+    // Fallback to keyword-based check
+    return null;
+  }
 };
 
 /**
  * Generate a safety pivot response (Warning + Safe Alternative)
  */
 const generateSafetyPivotResponse = (safetyData, query) => {
-    const response = `I appreciate you reaching out about your yoga practice! Since you mentioned ${safetyData.detectedCondition}, I want to make sure you stay safe.
+  const response = `I appreciate you reaching out about your yoga practice! Since you mentioned ${safetyData.detectedCondition}, I want to make sure you stay safe.
 
 ${safetyData.reason}
 
@@ -75,18 +75,18 @@ ${safetyData.reason}
 
 These gentler practices can still provide wonderful benefits while keeping you comfortable and safe. 🙏`;
 
-    return response;
+  return response;
 };
 
 /**
  * Generate safety message with doctor/instructor consultation advice
  */
 const generateSmartSafetyMessage = (safetyData) => {
-    return `⚠️ ${safetyData.reason}\n\n👨‍⚕️ Please consult a doctor or certified yoga instructor before attempting any yoga practice. They can provide personalized guidance based on your specific health condition.`;
+  return `⚠️ ${safetyData.reason}\n\n👨‍⚕️ Please consult a doctor or certified yoga instructor before attempting any yoga practice. They can provide personalized guidance based on your specific health condition.`;
 };
 
 module.exports = {
-    checkSafetyWithLLM,
-    generateSafetyPivotResponse,
-    generateSmartSafetyMessage,
+  checkSafetyWithLLM,
+  generateSafetyPivotResponse,
+  generateSmartSafetyMessage,
 };

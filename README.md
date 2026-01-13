@@ -25,30 +25,125 @@ An intelligent Retrieval-Augmented Generation (RAG) system providing safe, evide
 | -------------- | ----------------- | ------------------------------ |
 | **Vector DB**  | Pinecone          | Semantic search (384d, cosine) |
 | **Embeddings** | Transformers.js   | Local model (all-MiniLM-L6-v2) |
-| **Generation** | Gemini Pro        | AI responses (with fallback)   |
-| **Database**   | MongoDB Atlas     | Query logging                  |
+| **Generation** | Groq (Llama 3.1)  | Fast AI responses              |
+| **Database**   | MongoDB Atlas     | Query logging & analytics      |
 | **Backend**    | Node.js + Express | REST API                       |
-| **Frontend**   | React + Vite      | User interface                 |
+| **Frontend**   | React + Vite      | Modern chat interface          |
 
 ---
 
-## 🏗️ RAG Pipeline
+### Detailed Pipeline
 
 ```
-User Query
-    ↓
-Safety Check (50+ medical keywords)
-    ↓
-Local Embedding (384d, ~500ms)
-    ↓
-Pinecone Search (Top-5, cosine similarity)
-    ↓
-AI Generation (Gemini Pro / Fallback)
-    ↓
-MongoDB Logging (complete context)
-    ↓
-Response + Sources
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         USER QUERY                                       │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  1. SAFETY DETECTION                                                     │
+│     • Keyword-based check (50+ medical terms)                           │
+│     • LLM-based safety analysis for unsafe queries                      │
+│     • Generates safe alternatives if health condition detected          │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  2. EMBEDDING GENERATION                                                 │
+│     • Model: all-MiniLM-L6-v2 (Transformers.js)                         │
+│     • Dimensions: 384                                                    │
+│     • Runs locally (zero API cost)                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  3. VECTOR SEARCH (Pinecone)                                            │
+│     • Cosine similarity matching                                         │
+│     • Returns Top 5 relevant chunks                                      │
+│     • Includes metadata (title, source, page)                           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  4. LLM RESPONSE GENERATION (Groq)                                      │
+│     • Model: llama-3.1-8b-instant                                       │
+│     • Safe queries: Normal conversational response                      │
+│     • Unsafe queries: Safety pivot with alternatives                    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  5. RESPONSE TO USER                                                     │
+│     • AI Answer + Source Citations                                       │
+│     • Safety Warning Banner (if unsafe)                                  │
+│     • Logged to MongoDB for analytics                                   │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
+
+### Simplified Flow
+
+```
+User Query → Validation → Safety Check → Embedding (384d) → Pinecone Search → LLM Response → MongoDB Log → Response + Sources
+```
+
+### Component Architecture
+
+```mermaid
+graph TB
+    subgraph Frontend["🖥️ Frontend (React + Vite)"]
+        UI[App.jsx - Chat UI]
+        API[api.js - API Service]
+        SW[SafetyWarning.jsx]
+        SL[SourcesList.jsx]
+    end
+
+    subgraph Backend["⚙️ Backend (Node.js + Express)"]
+        Server[server.js]
+        Routes[routes/ask.js]
+
+        subgraph Services["Services"]
+            Embed[local-embeddings.js]
+            Retrieve[retrieval.js]
+            Generate[generation.js]
+            Safety[safety.js + smart-safety.js]
+        end
+
+        Models[models/QueryLog.js]
+    end
+
+    subgraph External["☁️ External Services"]
+        Pinecone[(Pinecone Vector DB)]
+        MongoDB[(MongoDB Atlas)]
+        Groq[Groq LLM API]
+    end
+
+    UI --> API
+    API --> Server
+    Server --> Routes
+    Routes --> Embed
+    Routes --> Safety
+    Routes --> Retrieve
+    Retrieve --> Pinecone
+    Routes --> Generate
+    Generate --> Groq
+    Routes --> Models
+    Models --> MongoDB
+
+    style Frontend fill:#e3f2fd
+    style Backend fill:#f3e5f5
+    style External fill:#e8f5e9
+```
+
+### Performance Breakdown
+
+| Step      | Component                       | Time          |
+| --------- | ------------------------------- | ------------- |
+| 1         | Input Validation + Safety Check | ~30ms         |
+| 2         | Local Embedding Generation      | ~400-500ms    |
+| 3         | Pinecone Vector Search          | ~100-200ms    |
+| 4         | Groq LLM Response               | ~800-1500ms   |
+| 5         | MongoDB Logging                 | ~100ms        |
+| **Total** | **End-to-End**                  | **~1.5-2.5s** |
 
 ---
 

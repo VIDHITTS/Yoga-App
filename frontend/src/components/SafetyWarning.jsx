@@ -45,9 +45,11 @@ const SafetyWarning = ({ safety }) => {
         <div className="consult-box">
           <span className="consult-icon">👨‍⚕️</span>
           <p className="consult-text">
-            <strong>Please consult a doctor or certified yoga instructor</strong> before 
-            attempting any yoga practice. They can provide personalized guidance based on 
-            your specific health condition.
+            <strong>
+              Please consult a doctor or certified yoga instructor
+            </strong>{" "}
+            before attempting any yoga practice. They can provide personalized
+            guidance based on your specific health condition.
           </p>
         </div>
         <p className="footer-text">
