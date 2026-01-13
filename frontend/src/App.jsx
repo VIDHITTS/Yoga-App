@@ -2,13 +2,16 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Sun, Sparkles, User, Bot } from 'lucide-react';
 import WarningBanner from './components/ui/WarningBanner';
+import { askQuestion } from './services/api';
 import './App.css';
 
 function App() {
   const [showWarning, setShowWarning] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
   const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, sender: 'ai', text: 'Namaste. I am your yoga wellness guide. How is your posture feeling today?' }
+    { id: 1, sender: 'ai', text: 'Namaste. I am your yoga wellness guide. Ask me anything about yoga!' }
   ]);
   const messagesEndRef = useRef(null);
 
@@ -20,33 +23,36 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isLoading) return;
 
     // Add User Message
     const newUserMsg = { id: Date.now(), sender: 'user', text: inputMessage };
     setMessages(prev => [...prev, newUserMsg]);
+    const query = inputMessage;
     setInputMessage('');
+    setIsLoading(true);
 
-    // Simulate AI Response (and potentially a warning for demo purposes)
-    setTimeout(() => {
-      const aiResponses = [
-        "Remember to keep your spine straight and shoulders relaxed.",
-        "That's a great question. Let's focus on your breathing.",
-        "I can help you adjust that pose. Could you describe any discomfort?",
-        "Mindfulness is key to this practice."
-      ];
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-
-      const newAiMsg = { id: Date.now() + 1, sender: 'ai', text: randomResponse };
+    try {
+      // Call real backend API
+      const response = await askQuestion(query);
+      
+      // Add AI response
+      const newAiMsg = { id: Date.now() + 1, sender: 'ai', text: response.answer };
       setMessages(prev => [...prev, newAiMsg]);
 
-      // Demo logic: If user types "posture" or "pain", trigger the warning
-      if (inputMessage.toLowerCase().includes('pain') || inputMessage.toLowerCase().includes('posture')) {
+      // Show safety warning if query was unsafe
+      if (response.safety && response.safety.isUnsafe) {
+        setWarningMessage(response.safety.message || 'Please consult a healthcare professional for personalized guidance.');
         setShowWarning(true);
       }
-    }, 1000);
+    } catch (error) {
+      const errorMsg = { id: Date.now() + 1, sender: 'ai', text: 'Sorry, I encountered an error. Please try again.' };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,7 +64,7 @@ function App() {
 
       <WarningBanner
         isVisible={showWarning}
-        message="Gentle reminder: Please correct your posture to avoid strain."
+        message={warningMessage || "⚠️ This query involves health conditions. Please consult a healthcare provider."}
         onClose={() => setShowWarning(false)}
       />
 
