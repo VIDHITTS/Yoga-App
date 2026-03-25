@@ -1,7 +1,6 @@
-/**
- * Safety detection system for identifying potentially unsafe queries
- * Detects health conditions that require professional medical guidance
- */
+
+
+// Detects health conditions that require professional medical guidance
 
 const UNSAFE_KEYWORDS = {
   pregnancy: [

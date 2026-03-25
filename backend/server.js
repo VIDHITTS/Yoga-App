@@ -10,8 +10,8 @@ const { initPinecone } = require("./config/pinecone");
 // Initialize Express app
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (Temporarily bypassed)
+// connectDB();
 
 // Initialize Pinecone
 initPinecone().catch((err) => {

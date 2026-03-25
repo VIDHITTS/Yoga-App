@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
     // Step 1: Safety Detection (do this FIRST before boundary check)
     const safetyCheck = detectUnsafeQuery(query);
     console.log(
-      `🛡️  Safety Check: ${safetyCheck.isUnsafe ? "⚠️ UNSAFE" : "✅ SAFE"}`
+      `🛡️  Safety Check: ${safetyCheck.isUnsafe ? "UNSAFE" : "SAFE"}`
     );
 
     if (safetyCheck.isUnsafe) {
@@ -108,8 +108,9 @@ router.post("/", async (req, res) => {
         userAgent: req.get("user-agent"),
       });
 
-      await queryLog.save();
-      console.log(`📝 Query logged to MongoDB (ID: ${queryLog._id})`);
+      // Temporarily removed MongoDB logging
+      // await queryLog.save();
+      // console.log(`📝 Query logged to MongoDB (ID: ${queryLog._id})`);
 
       return res.json({
         success: true,
@@ -131,14 +132,14 @@ router.post("/", async (req, res) => {
     }
 
     // Step 2: Generate Embedding
-    console.log("🔢 Generating embedding...");
+    console.log("Generating embedding...");
     const embedding = await generateEmbedding(query);
-    console.log(`   ✅ Embedding generated (${embedding.length} dimensions)`);
+    console.log(`Embedding generated (${embedding.length} dimensions)`);
 
     // Step 3: Retrieve Relevant Context
     console.log("📚 Retrieving relevant context from Pinecone...");
     const retrievedChunks = await retrieveContext(embedding);
-    console.log(`   ✅ Retrieved ${retrievedChunks.length} relevant chunks`);
+    console.log(`Retrieved ${retrievedChunks.length} relevant chunks`);
 
     retrievedChunks.forEach((chunk, idx) => {
       console.log(
@@ -147,7 +148,7 @@ router.post("/", async (req, res) => {
     });
 
     // Step 4: Generate Response
-    console.log("🤖 Generating AI response...");
+    console.log("Generating AI response...");
     let answer;
     let safetyMessage = null;
     let safeAlternatives = [];
@@ -218,8 +219,9 @@ router.post("/", async (req, res) => {
       userAgent: req.get("user-agent"),
     });
 
-    await queryLog.save();
-    console.log(`💾 Query logged to MongoDB (ID: ${queryLog._id})`);
+    // Temporarily removed MongoDB logging
+    // await queryLog.save();
+    // console.log(`💾 Query logged to MongoDB (ID: ${queryLog._id})`);
 
     // Step 7: Send Response
     res.json({
@@ -257,7 +259,8 @@ router.post("/", async (req, res) => {
         responseTime: Date.now() - startTime,
         retrievedChunks: [],
       });
-      await errorLog.save();
+      // Temporarily removed MongoDB logging
+      // await errorLog.save();
     } catch (logError) {
       console.error("Failed to log error:", logError);
     }
