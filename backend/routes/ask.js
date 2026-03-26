@@ -95,25 +95,31 @@ router.post("/", async (req, res) => {
         "I'm a yoga wellness assistant and can only answer questions about yoga practice, poses, breathing techniques, and meditation. Please ask me something related to yoga!";
 
       // Still log to MongoDB for tracking
-      const queryLog = new QueryLog({
-        query: query.trim(),
-        embedding: [],
-        retrievedChunks: [],
-        answer: rejectionMessage,
-        isUnsafe: false,
-        safetyKeywords: [],
-        safetyMessage: null,
-        responseTime: Date.now() - startTime,
-        ipAddress: req.ip,
-        userAgent: req.get("user-agent"),
-      });
+      let rejectionLogId = null;
+      try {
+        const queryLog = new QueryLog({
+          query: query.trim(),
+          embedding: [],
+          retrievedChunks: [],
+          answer: rejectionMessage,
+          isUnsafe: false,
+          safetyKeywords: [],
+          safetyMessage: null,
+          responseTime: Date.now() - startTime,
+          ipAddress: req.ip,
+          userAgent: req.get("user-agent"),
+        });
 
-      await queryLog.save();
-      console.log(`📝 Query logged to MongoDB (ID: ${queryLog._id})`);
+        await queryLog.save();
+        rejectionLogId = queryLog._id;
+        console.log(`📝 Query logged to MongoDB (ID: ${rejectionLogId})`);
+      } catch (dbError) {
+        console.error("⚠️ MongoDB logging failed (response still sent):", dbError.message);
+      }
 
       return res.json({
         success: true,
-        queryId: queryLog._id,
+        queryId: rejectionLogId,
         answer: rejectionMessage,
         sources: [],
         safety: {
@@ -194,37 +200,43 @@ router.post("/", async (req, res) => {
     }
     console.log("   ✅ Response generated");
 
-    // Step 6: Log to MongoDB
+    // Step 6: Log to MongoDB (non-blocking — response still sent if DB fails)
     const responseTime = Date.now() - startTime;
     console.log(`⏱️  Response time: ${responseTime}ms`);
 
-    const queryLog = new QueryLog({
-      query: query.trim(),
-      embedding: embedding.slice(0, 100), // Store only first 100 dims to save space
-      retrievedChunks: retrievedChunks.map((chunk) => ({
-        chunkId: chunk.chunkId,
-        title: chunk.title,
-        content: chunk.content.substring(0, 200), // Store truncated content
-        source: chunk.source,
-        page: chunk.page,
-        score: chunk.score,
-      })),
-      answer,
-      isUnsafe: safetyCheck.isUnsafe,
-      safetyKeywords: safetyCheck.keywords,
-      safetyMessage,
-      responseTime,
-      ipAddress: req.ip || req.connection.remoteAddress,
-      userAgent: req.get("user-agent"),
-    });
+    let queryLogId = null;
+    try {
+      const queryLog = new QueryLog({
+        query: query.trim(),
+        embedding: embedding.slice(0, 100), // Store only first 100 dims to save space
+        retrievedChunks: retrievedChunks.map((chunk) => ({
+          chunkId: chunk.chunkId,
+          title: chunk.title,
+          content: chunk.content.substring(0, 200), // Store truncated content
+          source: chunk.source,
+          page: chunk.page,
+          score: chunk.score,
+        })),
+        answer,
+        isUnsafe: safetyCheck.isUnsafe,
+        safetyKeywords: safetyCheck.keywords,
+        safetyMessage,
+        responseTime,
+        ipAddress: req.ip || req.connection.remoteAddress,
+        userAgent: req.get("user-agent"),
+      });
 
-    await queryLog.save();
-    console.log(`💾 Query logged to MongoDB (ID: ${queryLog._id})`);
+      await queryLog.save();
+      queryLogId = queryLog._id;
+      console.log(`💾 Query logged to MongoDB (ID: ${queryLogId})`);
+    } catch (dbError) {
+      console.error("⚠️ MongoDB logging failed (response still sent):", dbError.message);
+    }
 
     // Step 7: Send Response
     res.json({
       success: true,
-      queryId: queryLog._id,
+      queryId: queryLogId,
       answer,
       sources: retrievedChunks.map((chunk, idx) => ({
         id: idx + 1,

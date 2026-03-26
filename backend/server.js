@@ -10,6 +10,9 @@ const { initPinecone } = require("./config/pinecone");
 // Initialize Express app
 const app = express();
 
+// Trust proxy (required for Render and other reverse proxy deployments)
+app.set("trust proxy", 1);
+
 // Connect to MongoDB
 connectDB();
 
