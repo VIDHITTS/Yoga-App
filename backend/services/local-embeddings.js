@@ -1,5 +1,3 @@
-const { pipeline } = require("@xenova/transformers");
-
 /**
  * Local embeddings using Transformers.js - FREE, no API keys needed!
  * Uses all-MiniLM-L6-v2 model (384 dimensions)
@@ -15,6 +13,7 @@ async function initEmbedder() {
     console.log(
       "🤖 Initializing local embedding model (first time may take a moment to download)..."
     );
+    const { pipeline } = await import("@xenova/transformers");
     embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
     console.log("✅ Local embeddings ready!");
   }
